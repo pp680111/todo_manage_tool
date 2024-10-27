@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_manage/widget/todo_thing/todo_thing_detail.dart';
 
 import '../../model/todo_thing/todo_thing_dto.dart';
 
@@ -28,6 +29,12 @@ class TodoThingListItem extends StatelessWidget {
           fontSize: 16,
         ),
       ),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => TodoThingDetail(item: item))
+        );
+      },
       trailing: _TrailingItem(deadLine: item.deadlineTime)
     );
   }

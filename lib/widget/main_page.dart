@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_manage/widget/todo_thing/todo_thing_list.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -24,27 +25,44 @@ class _MainPageState extends State<MainPage> {
                 _selectedIndex = index;
               });
             },
-            destinations: [
-              NavigationRailDestination(
-                icon: Icon(Icons.calendar_month),
-                label: Text("全部"),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.folder),
-                label: Text("分类"),
-              ),
-            ],
-          ),
-          const VerticalDivider(thickness: 1,width: 1),
-          Expanded(
+            destinations: _getDestinationList()
+          ),Expanded(
             child: Column(
               children: [
-                const Text('hello')
+                Container(
+                  height: 80,
+                  child: Placeholder(), // 搜索条组件的占位符
+                ),
+                Expanded(
+                  child: _switchContainerComponent()
+                )
               ],
-            ),
-          )
+            )
+          ),
         ],
       ),
     );
+  }
+
+  List<NavigationRailDestination> _getDestinationList() {
+    return const [
+      NavigationRailDestination(
+        icon: Icon(Icons.calendar_month),
+        label: Text("全部"),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.folder),
+        label: Text("分类"),
+      ),
+    ];
+  }
+
+  Widget _switchContainerComponent() {
+    return switch (_selectedIndex) {
+      0 => TodoThingList(),
+      1 => Placeholder(child: Text("Category"),),
+      // TODO: Handle this case.
+      int() => throw UnimplementedError(),
+    };
   }
 }

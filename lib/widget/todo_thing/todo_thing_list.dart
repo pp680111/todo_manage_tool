@@ -16,12 +16,10 @@ class TodoThingList extends StatefulWidget {
 class _TodoThingListState extends State<TodoThingList> {
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView.builder(
-        itemBuilder: (context, index) {
-          return _getItem(index);
-        },
-      ),
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        return _getItem(index);
+      },
     );
   }
 
