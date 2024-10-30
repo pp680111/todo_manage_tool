@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_manage/widget/search_bar_component.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_list.dart';
 
 class MainPage extends StatefulWidget {
@@ -30,8 +31,7 @@ class _MainPageState extends State<MainPage> {
             child: Column(
               children: [
                 Container(
-                  height: 80,
-                  child: Placeholder(), // 搜索条组件的占位符
+                  child: const SearchBarComponent(), // 搜索条组件的占位符
                 ),
                 Expanded(
                   child: _switchContainerComponent()

@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
-import 'package:path/path.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/utils/DateTimeUtils.dart';
 
@@ -95,6 +93,14 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                 ),
               ],
             )
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (context, index) {
+                return _buildProgressItem(index);
+              },
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+            )
           )
         ],
       ),
@@ -123,5 +129,9 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
     });
 
     await selectedDate;
+  }
+
+  Widget _buildProgressItem(int index) {
+    return Placeholder();
   }
 }
