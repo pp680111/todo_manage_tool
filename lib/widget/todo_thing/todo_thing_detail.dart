@@ -17,6 +17,7 @@ class TodoThingDetail extends StatefulWidget {
 
 class _TodoThingDetailState extends State<TodoThingDetail> {
   Map<String, dynamic> _formData = {};
+  bool editMode = true;
 
   @override
   void initState() {
@@ -24,6 +25,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
 
     if (widget.item != null) {
       _formData = widget.item!.toMap();
+      editMode = false;
     }
   }
 
@@ -77,19 +79,20 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
             height: 80,
             child: Row(
               children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
-                    child: TextField(
-                      controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["createTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          label: Text("创建时间")
+                if (!editMode)
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+                      child: TextField(
+                        controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["createTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
+                        decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            label: Text("创建时间")
+                        ),
+                        readOnly: true,
                       ),
-                      readOnly: true,
                     ),
                   ),
-                ),
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.only(right: 16, top: 8, bottom: 8, left: 8),
@@ -106,14 +109,15 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
               ],
             )
           ),
-          Expanded(
-            child: ListView.builder(
-              itemBuilder: (context, index) {
-                return _buildProgressItem(index);
-              },
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+          if (!editMode)
+            Expanded(
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return _buildProgressItem(index);
+                },
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+              )
             )
-          )
         ],
       ),
     );
