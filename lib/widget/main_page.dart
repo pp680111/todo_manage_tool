@@ -28,16 +28,7 @@ class _MainPageState extends State<MainPage> {
             },
             destinations: _getDestinationList()
           ),Expanded(
-            child: Column(
-              children: [
-                Container(
-                  child: const SearchBarComponent(), // 搜索条组件的占位符
-                ),
-                Expanded(
-                  child: _switchContainerComponent()
-                )
-              ],
-            )
+            child: _switchContainerComponent()
           ),
         ],
       ),

@@ -4,9 +4,9 @@ import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/utils/DateTimeUtils.dart';
 
 class TodoThingDetail extends StatefulWidget {
-  TodoThingDTO item;
+  TodoThingDTO? item;
 
-  TodoThingDetail({super.key, required this.item});
+  TodoThingDetail({super.key, this.item});
 
   @override
   State<StatefulWidget> createState() {
@@ -16,11 +16,23 @@ class TodoThingDetail extends StatefulWidget {
 }
 
 class _TodoThingDetailState extends State<TodoThingDetail> {
+  Map<String, dynamic> _formData = {};
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.item != null) {
+      _formData = widget.item!.toMap();
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("详情"),
+        title: widget.item == null ? const Text("编辑") : const Text("详情"),
       ),
       body: Column(
         children: [
@@ -28,7 +40,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
             height: 80,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TextField(
-              controller: TextEditingController(text: widget.item.title),
+              controller: TextEditingController(text: _formData["title"]),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 label: Text(
@@ -48,7 +60,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
             height: 200,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TextField(
-              controller: TextEditingController(text: widget.item.detail),
+              controller: TextEditingController(text: _formData["detail"]),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 label: Text(
@@ -69,7 +81,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                   child: Container(
                     padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
                     child: TextField(
-                      controller: TextEditingController(text: DateTimeUtils.formatDateTime(widget.item.createTime, DateTimeUtils.yyyyMMddHHmmFormat)),
+                      controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["createTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           label: Text("创建时间")
@@ -82,12 +94,12 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                   child: Container(
                     padding: const EdgeInsets.only(right: 16, top: 8, bottom: 8, left: 8),
                     child: TextField(
-                      controller: TextEditingController(text: DateTimeUtils.formatDateTime(widget.item.deadlineTime, DateTimeUtils.yyyyMMddHHmmFormat)),
+                      controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["deadlineTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         label: Text("截止时间")
                       ),
-                      onTap: () {_showDatePicker(context, widget.item.deadlineTime);},
+                      onTap: () {_showDatePicker(context, _formData["deadlineTime"]);},
                     ),
                   ),
                 ),
@@ -123,7 +135,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
     selectedDate.then((dateTime) {
       setState(() {
         if (dateTime != null) {
-          widget.item.deadlineTime = dateTime;
+          _formData["deadlineTime"] = dateTime;
         }
       });
     });
