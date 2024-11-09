@@ -77,12 +77,12 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
           ),
           Container(
             height: 80,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
                 if (!editMode)
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
                       child: TextField(
                         controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["createTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
                         decoration: const InputDecoration(
@@ -95,7 +95,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                   ),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.only(right: 16, top: 8, bottom: 8, left: 8),
+                    padding: EdgeInsets.only(left: editMode ? 0 : 8),
                     child: TextField(
                       controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["deadlineTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
                       decoration: const InputDecoration(
