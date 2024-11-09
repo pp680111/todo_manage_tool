@@ -52,7 +52,37 @@ class _TrailingItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(getDeadLineText()),
-        IconButton(onPressed: () => {}, icon: const Icon(Icons.more_vert_outlined))
+        // PopupMenuButton(
+        //   icon: const Icon(Icons.more_vert_outlined),
+        //   itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+        //     const PopupMenuItem(
+        //       value: 1,
+        //       child: Text("删除"),
+        //     ),
+        //   ],
+        // )
+        MenuAnchor(
+          builder: (BuildContext context, MenuController controller, Widget? child) {
+            return IconButton(
+              icon: const Icon(Icons.more_vert_outlined),
+              onPressed: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              }
+            );
+          },
+          menuChildren: [
+            MenuItemButton(
+              onPressed: () {
+
+              },
+              child: const Text("删除"),
+            ),
+          ],
+        )
       ],
     );
   }
