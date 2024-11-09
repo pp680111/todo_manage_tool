@@ -1,10 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
 import 'package:todo_manage/widget/search_bar_component.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_detail.dart';
+import 'package:todo_manage/widget/todo_thing/todo_thing_item_change_notifier.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_list_item.dart';
 
 class TodoThingList extends StatefulWidget {
@@ -22,31 +24,25 @@ class _TodoThingListState extends State<TodoThingList> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SearchBarComponent(onSearchChange: () {}, onAddButtonPress: () => _invokeEditPage(context)),
-        Expanded(
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return _getItem(index);
+    return ChangeNotifierProvider(
+      create: (context) => TodoThingItemProvider(),
+      child: Column(
+        children: [
+          SearchBarComponent(onSearchChange: () {}, onAddButtonPress: () => _invokeEditPage(context)),
+          Consumer<TodoThingItemProvider>(
+            builder: (context, notifier, child) {
+              return Expanded(
+                  child: ListView.builder(
+                    itemBuilder: (context, index) {
+                      return TodoThingListItem(item: notifier.getItem(index));
+                    },
+                  )
+              );
             },
           )
-        )
-      ],
+        ],
+      )
     );
-  }
-
-  Widget _getItem(int index) {
-    String randomStr = List.generate(Random().nextInt(500),
-            (index) => index).map((e) => e.toString()).join();
-
-    TodoThingDTO dto = TodoThingDTO(id: index,
-        title: "title $index",
-        status: TodoThingState.NOT_START,
-        detail: randomStr,
-        createTime: DateTime.now(),
-        updateTime: DateTime.now());
-    return TodoThingListItem(item: dto);
   }
 
   void _invokeEditPage(BuildContext context) {
