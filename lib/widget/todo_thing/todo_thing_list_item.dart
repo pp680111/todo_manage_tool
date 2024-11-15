@@ -37,7 +37,7 @@ class TodoThingListItem extends StatelessWidget {
           MaterialPageRoute(builder: (context) => TodoThingDetail(item: item))
         );
       },
-      trailing: _TrailingItem(deadLine: item.deadlineTime)
+      trailing: _TrailingItem(deadLine: item.deadlineTime),
     );
   }
 
@@ -73,6 +73,7 @@ class _TrailingItem extends StatelessWidget {
                 notifier.onItemDelete();
               },
               child: const Text("删除"),
+              requestFocusOnHover: false,
             ),
           ],
         )
