@@ -34,7 +34,11 @@ class _TodoThingListState extends State<TodoThingList> {
               return Expanded(
                   child: ListView.builder(
                     itemBuilder: (context, index) {
-                      return TodoThingListItem(item: notifier.getItem(index));
+                      TodoThingDTO? dto = notifier.getItem(index);
+                      if (dto == null) {
+                        return null;
+                      }
+                      return TodoThingListItem(item: dto);
                     },
                   )
               );
@@ -45,11 +49,14 @@ class _TodoThingListState extends State<TodoThingList> {
     );
   }
 
-  void _invokeEditPage(BuildContext context) {
+  void _invokeEditPage(BuildContext context) async {
     if (context != null) {
-      Navigator.push(context, CupertinoPageRoute(builder: (context) {
+      await Navigator.push(context, CupertinoPageRoute(builder: (context) {
         return TodoThingDetail();
       }));
+      setState(() {
+
+      });
     }
   }
 }

@@ -70,10 +70,10 @@ class _TrailingItem extends StatelessWidget {
             MenuItemButton(
               onPressed: () {
                 TodoThingItemProvider notifier = Provider.of<TodoThingItemProvider>(context, listen: false);
-                notifier.onItemDelete();
+                notifier.deleteItem();
               },
-              child: const Text("删除"),
               requestFocusOnHover: false,
+              child: const Text("删除"),
             ),
           ],
         )

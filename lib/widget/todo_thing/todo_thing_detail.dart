@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
+import 'package:todo_manage/model/todo_thing/todo_thing_db.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/utils/DateTimeUtils.dart';
+import 'package:todo_manage/widget/progressing_overlay.dart';
 
 class TodoThingDetail extends StatefulWidget {
   TodoThingDTO? item;
@@ -56,6 +58,9 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                 fontWeight: FontWeight.bold,
                 fontSize: 20
               ),
+              onChanged: (text) {
+                _formData["title"] = text;
+              },
             )
           ),
           Container(
@@ -73,6 +78,9 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                 ),
               ),
               maxLines: 10,
+              onChanged: (text) {
+                _formData["detail"] = text;
+              },
             )
           ),
           Container(
@@ -103,6 +111,9 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                         label: Text("截止时间")
                       ),
                       onTap: () {_showDatePicker(context, _formData["deadlineTime"]);},
+                      onChanged: (time) {
+                        _formData["deadlineTime"] = time;
+                      },
                     ),
                   ),
                 ),
@@ -117,8 +128,14 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                 },
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
               )
-            )
+            ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.save),
+        onPressed: () {
+          _doSave(context);
+        },
       ),
     );
   }
@@ -149,5 +166,17 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
 
   Widget _buildProgressItem(int index) {
     return Placeholder();
+  }
+
+  void _doSave(BuildContext context) {
+    ProgressingOverlay.show(context, "保存中");
+
+    TodoThingDb.instance.insertOrUpdateFromMap(_formData)
+        .then((result) {
+          ProgressingOverlay.success(context, "保存成功")
+              .then((_) {
+                 Navigator.pop(context);
+              });
+        });
   }
 }
