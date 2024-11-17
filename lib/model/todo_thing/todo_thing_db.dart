@@ -25,6 +25,13 @@ class TodoThingDb extends _$TodoThingDb {
         .then((list) => list.map((e) => TodoThingDTO.mapToDTO(e)).toList());
   }
 
+  Future<List<TodoThingDTO>> page(int pageIndex, int pageSize) {
+    int start = (pageIndex <= 0 ? 0 : pageIndex - 1) * pageSize;
+    return (select(todoThing)..limit(pageSize, offset: start)).get()
+        .then((list) => list.map((e) => TodoThingDTO.mapToDTO(e)).toList());
+
+  }
+
   // Future<int> insertFromDTO(TodoThingDTO dto) {
   //   return into(todoThing).insert(_buildTodoThingCompanionFromDTO(dto));
   // }

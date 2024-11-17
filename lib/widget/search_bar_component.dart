@@ -32,7 +32,7 @@ class _SearchBarComponentState extends State<SearchBarComponent> {
           child: IconButton(
             icon: const Icon(Icons.add, size: 40,),
             onPressed: () {
-              widget.onAddButtonPress();
+              widget.onAddButtonPress(context);
             },
           )
       )
