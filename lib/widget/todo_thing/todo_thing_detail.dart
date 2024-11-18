@@ -175,7 +175,12 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
         .then((result) {
           ProgressingOverlay.success(context, "保存成功")
               .then((_) {
-                 Navigator.pop(context);
+                 Navigator.pop(context, true);
+              });
+        }).onError((e, stackTrace) {
+          ProgressingOverlay.error(context, "保存失败")
+              .then((_) {
+                  Navigator.pop(context, false);
               });
         });
   }

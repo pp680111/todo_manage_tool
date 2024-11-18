@@ -1,9 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_detail.dart';
-import 'package:todo_manage/widget/todo_thing/todo_thing_item_change_notifier.dart';
 
 import '../../model/todo_thing/todo_thing_dto.dart';
 
@@ -69,8 +66,7 @@ class _TrailingItem extends StatelessWidget {
           menuChildren: [
             MenuItemButton(
               onPressed: () {
-                TodoThingItemProvider notifier = Provider.of<TodoThingItemProvider>(context, listen: false);
-                notifier.deleteItem();
+                // TODO
               },
               requestFocusOnHover: false,
               child: const Text("删除"),

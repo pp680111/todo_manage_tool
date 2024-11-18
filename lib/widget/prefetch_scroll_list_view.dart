@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class PrefetchScrollListViewController<T> {
+class PrefetchScrollListViewController<T> extends ChangeNotifier {
   int _pageIndex = 1;
   int _pageSize = 20;
   bool hasNextPage = true;
@@ -44,11 +44,12 @@ class PrefetchScrollListViewController<T> {
         _pageIndex++;
       }
     } finally {
+      notifyListeners();
       isLoading = false;
     }
   }
 
-  void reset() async {
+  void refresh() async {
     _pageIndex = 1;
     _items.clear();
     hasNextPage = true;
@@ -71,18 +72,14 @@ class PrefetchScrollListViewController<T> {
 }
 
 class PrefetchScrollListView<T> extends StatefulWidget {
+  final PrefetchScrollListViewController<T> _controller;
+  final Widget Function(T item) _itemBuilder;
 
-  final Future<List<T>> Function(int pageIndex, int pageSize) dataProvider;
-  final Widget Function(T item) itemBuilder;
-
-  PrefetchScrollListView({
-    required this.dataProvider,
-    required this.itemBuilder
-  });
+  const PrefetchScrollListView(this._controller, this._itemBuilder, {super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _PrefetchScrollListViewState.build(dataProvider, itemBuilder);
+    return _PrefetchScrollListViewState(_controller, _itemBuilder);
   }
 }
 
@@ -91,10 +88,7 @@ class _PrefetchScrollListViewState<T> extends State<PrefetchScrollListView> {
   final PrefetchScrollListViewController<T> _controller;
   final Widget Function(T item) _itemBuilder;
 
-  _PrefetchScrollListViewState.build(Future<List<T>> Function(int pageIndex, int pageSize) dataProvider,
-      this._itemBuilder)
-      : _controller = PrefetchScrollListViewController(dataProvider: dataProvider);
-
+  _PrefetchScrollListViewState(this._controller, this._itemBuilder);
 
   @override
   void initState() {
@@ -106,16 +100,21 @@ class _PrefetchScrollListViewState<T> extends State<PrefetchScrollListView> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: _controller._items.length + (_controller.hasNextPage ? 1 : 0),
-      itemBuilder: (context, index) {
-        T? item = _controller.itemAt(index);
-        if (item != null) {
-          return _itemBuilder(item);
-        } else {
-          return null;
-        }
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, _) {
+        return ListView.builder(
+          controller: _scrollController,
+          itemCount: _controller._items.length + (_controller.hasNextPage ? 1 : 0),
+          itemBuilder: (context, index) {
+            T? item = _controller.itemAt(index);
+            if (item != null) {
+              return _itemBuilder(item);
+            } else {
+              return null;
+            }
+          },
+        );
       },
     );
   }
