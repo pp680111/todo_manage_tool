@@ -21,12 +21,13 @@ class TodoThingListItem extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        item.detail ?? "",
+        item.detail != null ? item.detail!.trim() : "",
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(
           color: Colors.grey,
           fontSize: 16,
         ),
+        maxLines: 2,
       ),
       onTap: () {
         Navigator.push(
