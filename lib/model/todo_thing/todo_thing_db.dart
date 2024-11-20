@@ -37,11 +37,16 @@ class TodoThingDb extends _$TodoThingDb {
   // }
 
   Future insertOrUpdateFromMap(Map<String, dynamic> formMap) {
-    if (!formMap.containsKey('id')) {
-      _initDefValForFormMap(formMap);
-      return into(todoThing).insert(_buildTodoThingCompanionFromMap(formMap));
-    } else {
-      return update(todoThing).replace(_buildTodoThingCompanionFromMap(formMap));
+    try {
+      if (!formMap.containsKey('id')) {
+        _initDefValForFormMap(formMap);
+        return into(todoThing).insert(_buildTodoThingCompanionFromMap(formMap));
+      } else {
+        return (update(todoThing)..where((t) => t.id.equals(formMap['id'])))
+            .replace(_buildTodoThingCompanionFromMap(formMap));
+      }
+    } catch (e) {
+      return Future.error(e.toString());
     }
   }
   
@@ -51,7 +56,9 @@ class TodoThingDb extends _$TodoThingDb {
 
   TodoThingCompanion _buildTodoThingCompanionFromDTO(TodoThingDTO dto) {
     String? errMsg = _validateForm(dto);
-    // TODO 怎么抛出错误?
+    if (errMsg != null) {
+      throw Exception(errMsg);
+    }
 
     return TodoThingCompanion.insert(
       title: dto.title,
@@ -66,16 +73,19 @@ class TodoThingDb extends _$TodoThingDb {
 
   TodoThingCompanion _buildTodoThingCompanionFromMap(Map<String, dynamic> formMap) {
     String? errMsg = _validateFormMap(formMap);
-    // TODO 怎么抛出错误?
+    if (errMsg != null) {
+      throw Exception(errMsg);
+    }
 
-    return TodoThingCompanion.insert(
-      title: formMap['title'],
-      status: formMap['status'],
-      detail: Value.absentIfNull(formMap['detail']),
-      categoryId: Value.absentIfNull(formMap['categoryId']),
-      createTime: formMap['createTime'],
-      updateTime: formMap['updateTime'],
-      deadlineTime: Value.absentIfNull(formMap['deadlineTime'])
+    return TodoThingCompanion(
+      id: Value(formMap['id']),
+      title: Value(formMap['title']),
+      status: Value((formMap['status'] as TodoThingState).key),
+      detail: Value(formMap['detail']),
+      categoryId: Value(formMap['categoryId']),
+      createTime: Value(formMap['createTime']),
+      updateTime: Value(formMap['updateTime']),
+      deadlineTime: Value(formMap['deadlineTime'])
     );
   }
 
@@ -97,16 +107,11 @@ class TodoThingDb extends _$TodoThingDb {
     }
 
     // status
-    if (formMap['status'] != null) {
-      if (formMap['status'] is! int) {
+    if (!formMap.containsKey('status')) {
+      return '分类不得为空';
+    }
+    if (formMap['status'] is! TodoThingState) {
         return '分类参数值类型错误';
-      }
-
-      try {
-        TodoThingState.fromKey(formMap['status']);
-      } catch (e) {
-        return '分类参数枚举值错误';
-      }
     }
 
     // categoryId
