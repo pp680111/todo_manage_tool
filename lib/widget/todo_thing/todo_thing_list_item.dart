@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_manage/model/todo_thing/todo_thing_db.dart';
+import 'package:todo_manage/widget/prefetch_scroll_list_view.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_detail.dart';
 
 import '../../model/todo_thing/todo_thing_dto.dart';
@@ -34,7 +37,7 @@ class TodoThingListItem extends StatelessWidget {
           MaterialPageRoute(builder: (context) => TodoThingDetail(item: item))
         );
       },
-      trailing: _TrailingItem(deadLine: item.deadlineTime),
+      trailing: _TrailingItem(deadLine: item.deadlineTime, id: item.id),
     );
   }
 
@@ -42,8 +45,9 @@ class TodoThingListItem extends StatelessWidget {
 
 class _TrailingItem extends StatelessWidget {
   DateTime? deadLine;
+  int id;
 
-  _TrailingItem({this.deadLine});
+  _TrailingItem({this.deadLine, required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +70,12 @@ class _TrailingItem extends StatelessWidget {
           menuChildren: [
             MenuItemButton(
               onPressed: () {
-                // TODO
+                TodoThingDb.instance.deleteById(id)
+                  .then((_) {
+                    PrefetchScrollListViewController controller = Provider.of<PrefetchScrollListViewController<TodoThingDTO>>(context, listen: false);
+                    controller.refresh();
+                  });
+                // TODO 补充删除失败的处理
               },
               requestFocusOnHover: false,
               child: const Text("删除"),

@@ -44,6 +44,10 @@ class TodoThingDb extends _$TodoThingDb {
       return update(todoThing).replace(_buildTodoThingCompanionFromMap(formMap));
     }
   }
+  
+  Future<int> deleteById(int id) {
+    return (delete(todoThing)..where((t) => t.id.equals(id))).go();
+  }
 
   TodoThingCompanion _buildTodoThingCompanionFromDTO(TodoThingDTO dto) {
     String? errMsg = _validateForm(dto);

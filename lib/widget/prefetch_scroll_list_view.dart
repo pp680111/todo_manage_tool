@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 class PrefetchScrollListViewController<T> extends ChangeNotifier {
   int _pageIndex = 1;
@@ -100,22 +101,25 @@ class _PrefetchScrollListViewState<T> extends State<PrefetchScrollListView> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: _controller,
-      builder: (context, _) {
-        return ListView.builder(
-          controller: _scrollController,
-          itemCount: _controller._items.length + (_controller.hasNextPage ? 1 : 0),
-          itemBuilder: (context, index) {
-            T? item = _controller.itemAt(index);
-            if (item != null) {
-              return _itemBuilder(item);
-            } else {
-              return null;
-            }
-          },
-        );
-      },
+    return ChangeNotifierProvider.value(
+      value: _controller,
+      child: ListenableBuilder(
+        listenable: _controller,
+        builder: (context, _) {
+          return ListView.builder(
+            controller: _scrollController,
+            itemCount: _controller._items.length + (_controller.hasNextPage ? 1 : 0),
+            itemBuilder: (context, index) {
+              T? item = _controller.itemAt(index);
+              if (item != null) {
+                return _itemBuilder(item);
+              } else {
+                return null;
+              }
+            },
+          );
+        },
+      )
     );
   }
 
