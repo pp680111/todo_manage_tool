@@ -9,8 +9,9 @@ import '../../model/todo_thing/todo_thing_dto.dart';
 
 class TodoThingListItem extends StatelessWidget {
   TodoThingDTO item;
+  void Function(BuildContext context, {TodoThingDTO? item}) onTap;
 
-  TodoThingListItem({required this.item});
+  TodoThingListItem({super.key, required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -33,15 +34,11 @@ class TodoThingListItem extends StatelessWidget {
         maxLines: 2,
       ),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => TodoThingDetail(item: item))
-        );
+        onTap(context, item: item);
       },
       trailing: _TrailingItem(deadLine: item.deadlineTime, id: item.id),
     );
   }
-
 }
 
 class _TrailingItem extends StatelessWidget {

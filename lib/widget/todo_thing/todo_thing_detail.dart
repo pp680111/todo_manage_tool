@@ -19,7 +19,7 @@ class TodoThingDetail extends StatefulWidget {
 
 class _TodoThingDetailState extends State<TodoThingDetail> {
   Map<String, dynamic> _formData = {};
-  bool editMode = true;
+  bool insertMode = true;
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
 
     if (widget.item != null) {
       _formData = widget.item!.toMap();
-      editMode = false;
+      insertMode = false;
     }
   }
 
@@ -88,7 +88,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                if (!editMode)
+                if (!insertMode)
                   Expanded(
                     child: Container(
                       child: TextField(
@@ -103,7 +103,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                   ),
                 Expanded(
                   child: Container(
-                    padding: EdgeInsets.only(left: editMode ? 0 : 8),
+                    padding: EdgeInsets.only(left: insertMode ? 0 : 8),
                     child: TextField(
                       controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["deadlineTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
                       decoration: const InputDecoration(
@@ -120,7 +120,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
               ],
             )
           ),
-          if (!editMode)
+          if (!insertMode)
             Expanded(
               child: ListView.builder(
                 itemBuilder: (context, index) {

@@ -1,6 +1,8 @@
 
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:todo_manage/model/database.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
@@ -17,7 +19,9 @@ class TodoThingDb extends _$TodoThingDb {
   int get schemaVersion => 1;
 
   static QueryExecutor _openConnection() {
-    return driftDatabase(name: 'app_database');
+    return LazyDatabase(() async {
+      return NativeDatabase(await DatabaseConstant.getSqliteFile(), logStatements: true);
+    });
   }
 
   Future<List<TodoThingDTO>> getAll() {
@@ -43,7 +47,7 @@ class TodoThingDb extends _$TodoThingDb {
         return into(todoThing).insert(_buildTodoThingCompanionFromMap(formMap));
       } else {
         return (update(todoThing)..where((t) => t.id.equals(formMap['id'])))
-            .replace(_buildTodoThingCompanionFromMap(formMap));
+            .write(_buildTodoThingCompanionFromMap(formMap));
       }
     } catch (e) {
       return Future.error(e.toString());
@@ -78,7 +82,6 @@ class TodoThingDb extends _$TodoThingDb {
     }
 
     return TodoThingCompanion(
-      id: Value(formMap['id']),
       title: Value(formMap['title']),
       status: Value((formMap['status'] as TodoThingState).key),
       detail: Value(formMap['detail']),
@@ -148,6 +151,6 @@ class TodoThingDb extends _$TodoThingDb {
   void _initDefValForFormMap(Map<String, dynamic> formMap) {
     formMap['createTime'] = DateTime.now();
     formMap['updateTime'] = DateTime.now();
-    formMap['status'] = TodoThingState.NOT_START.key;
+    formMap['status'] = TodoThingState.NOT_START;
   }
 }

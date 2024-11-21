@@ -29,11 +29,11 @@ class _TodoThingListState extends State<TodoThingList> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SearchBarComponent(onSearchChange: () {}, onAddButtonPress: (ctx) => _invokeEditPage(ctx)),
+        SearchBarComponent(onSearchChange: () {}, onAddButtonPress: (ctx) => invokeEditPage(ctx)),
         Expanded(
           child: PrefetchScrollListView<TodoThingDTO>(
             _prefetchScrollListViewController,
-            (i) => TodoThingListItem(item: i)
+            (i) => TodoThingListItem(item: i, onTap: invokeEditPage)
           )
         )
       ],
@@ -44,9 +44,9 @@ class _TodoThingListState extends State<TodoThingList> {
     return TodoThingDb.instance.page(pageIndex, pageSize);
   }
 
-  void _invokeEditPage(BuildContext context) async {
+  void invokeEditPage(BuildContext context, {TodoThingDTO? item}) async {
     bool? hasChanged = await Navigator.push(context, CupertinoPageRoute(builder: (context) {
-      return TodoThingDetail();
+      return TodoThingDetail(item: item);
     }));
 
     if (hasChanged != null && hasChanged) {
