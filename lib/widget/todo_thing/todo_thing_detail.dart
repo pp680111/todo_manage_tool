@@ -4,6 +4,7 @@ import 'package:todo_manage/model/todo_thing/todo_thing_db.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/utils/DateTimeUtils.dart';
 import 'package:todo_manage/widget/progressing_overlay.dart';
+import 'package:todo_manage/widget/todo_thing/todo_thing_progress_list.dart';
 
 class TodoThingDetail extends StatefulWidget {
   TodoThingDTO? item;
@@ -29,8 +30,8 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
       _formData = widget.item!.toMap();
       insertMode = false;
     }
-  }
 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,98 +39,93 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
       appBar: AppBar(
         title: widget.item == null ? const Text("编辑") : const Text("详情"),
       ),
-      body: Column(
-        children: [
-          Container(
-            height: 80,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              controller: TextEditingController(text: _formData["title"]),
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                label: Text(
-                  "标题",
-                  style: TextStyle(
-                    color: Colors.grey
-                  ),
-                ),
-              ),
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20
-              ),
-              onChanged: (text) {
-                _formData["title"] = text;
-              },
-            )
-          ),
-          Container(
-            height: 200,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              controller: TextEditingController(text: _formData["detail"]),
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                label: Text(
-                  "详情",
-                  style: TextStyle(
-                    color: Colors.grey
-                  ),
-                ),
-              ),
-              maxLines: 10,
-              onChanged: (text) {
-                _formData["detail"] = text;
-              },
-            )
-          ),
-          Container(
-            height: 80,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                if (!insertMode)
-                  Expanded(
-                    child: Container(
-                      child: TextField(
-                        controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["createTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            label: Text("创建时间")
-                        ),
-                        readOnly: true,
-                      ),
-                    ),
-                  ),
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.only(left: insertMode ? 0 : 8),
-                    child: TextField(
-                      controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["deadlineTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        label: Text("截止时间")
-                      ),
-                      onTap: () {_showDatePicker(context, _formData["deadlineTime"]);},
-                      onChanged: (time) {
-                        _formData["deadlineTime"] = time;
-                      },
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              height: 80,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextField(
+                controller: TextEditingController(text: _formData["title"]),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  label: Text(
+                    "标题",
+                    style: TextStyle(
+                      color: Colors.grey
                     ),
                   ),
                 ),
-              ],
-            )
-          ),
-          if (!insertMode)
-            Expanded(
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return _buildProgressItem(index);
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20
+                ),
+                onChanged: (text) {
+                  _formData["title"] = text;
                 },
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
               )
             ),
-        ],
+            Container(
+              height: 200,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextField(
+                controller: TextEditingController(text: _formData["detail"]),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  label: Text(
+                    "详情",
+                    style: TextStyle(
+                      color: Colors.grey
+                    ),
+                  ),
+                ),
+                maxLines: 10,
+                onChanged: (text) {
+                  _formData["detail"] = text;
+                },
+              )
+            ),
+            Container(
+              height: 80,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  if (!insertMode)
+                    Expanded(
+                      child: Container(
+                        child: TextField(
+                          controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["createTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              label: Text("创建时间")
+                          ),
+                          readOnly: true,
+                        ),
+                      ),
+                    ),
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.only(left: insertMode ? 0 : 8),
+                      child: TextField(
+                        controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["deadlineTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          label: Text("截止时间")
+                        ),
+                        onTap: () {_showDatePicker(context, _formData["deadlineTime"]);},
+                        onChanged: (time) {
+                          _formData["deadlineTime"] = time;
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ),
+            if (!insertMode)
+              TodoThingProgressList(_formData['id']),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.save),
@@ -162,10 +158,6 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
     });
 
     await selectedDate;
-  }
-
-  Widget _buildProgressItem(int index) {
-    return Placeholder();
   }
 
   void _doSave(BuildContext context) {
