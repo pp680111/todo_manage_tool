@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_manage/model/todo_thing_progress/todo_thing_progress_db.dart';
 
 class TodoThingProgressFormDialog extends StatefulWidget {
   int todoThingId;
@@ -19,32 +20,29 @@ class _TodoThingProgressFormDialogState
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text("添加进度"),
-      content: Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              height: 200,
-              width: 800,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: TextField(
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  label: Text(
-                    "内容",
-                    style: TextStyle(color: Colors.grey),
-                  ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 200,
+            width: 800,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                label: Text(
+                  "内容",
+                  style: TextStyle(color: Colors.grey),
                 ),
-                maxLines: 5,
-                onChanged: (text) {
-                  _formContent = text;
-                },
-              )
-            ),
-          ],
-        )
+              ),
+              maxLines: 5,
+              onChanged: (text) {
+                _formContent = text;
+              },
+            )
+          ),
+        ],
       ),
       actions: [
         TextButton(
@@ -58,7 +56,14 @@ class _TodoThingProgressFormDialogState
   }
 
   void _save(BuildContext context) async {
-    Navigator.pop(context);
-    // TODO
+    Map<String, dynamic> formMap = {
+      'todoThingId': widget.todoThingId,
+      'content': _formContent,
+    };
+    TodoThingProgressDb.instance.insert(formMap)
+        .then((_) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("保存成功")));
+          Navigator.pop(context);
+        });
   }
 }

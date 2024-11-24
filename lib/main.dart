@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:todo_manage/model/database.dart';
 import 'package:todo_manage/widget/main_page.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await DatabaseConstant.init();
   runApp(const MyApp());
 }
 

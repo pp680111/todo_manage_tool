@@ -64,8 +64,7 @@ class _TodoThingProgressListState extends State<TodoThingProgressList> {
               )
             ),
             child: FutureBuilder<List<TodoThingProgressDTO>>(
-              // future: TodoThingProgressDb.instance.getProgress(widget.todoThingId),
-              future: _mockData(),
+              future: TodoThingProgressDb.instance.getProgress(widget.todoThingId),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Container();
@@ -86,14 +85,6 @@ class _TodoThingProgressListState extends State<TodoThingProgressList> {
         )
       ],
     );
-  }
-
-  Future<List<TodoThingProgressDTO>> _mockData() {
-    List<TodoThingProgressDTO> mockData = [];
-    for (int i = 0; i < 20; i++) {
-      mockData.add(TodoThingProgressDTO(i, 1, "progress $i", false, DateTime.now(), DateTime.now()));
-    }
-    return Future.value(mockData);
   }
 }
 

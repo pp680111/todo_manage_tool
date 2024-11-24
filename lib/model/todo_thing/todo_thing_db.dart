@@ -1,6 +1,5 @@
 
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:todo_manage/model/database.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
@@ -12,16 +11,20 @@ part 'todo_thing_db.g.dart';
 class TodoThingDb extends _$TodoThingDb {
   static final TodoThingDb instance = TodoThingDb._internal();
 
-  TodoThingDb._internal() : super(_openConnection());
+  TodoThingDb._internal() : super(DatabaseConstant.executor);
 
   @override
   int get schemaVersion => 1;
 
-  static QueryExecutor _openConnection() {
-    return LazyDatabase(() async {
-      return NativeDatabase(await DatabaseConstant.getSqliteFile(), logStatements: true);
-    });
-  }
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) async {
+      m.createAll();
+    },
+    onUpgrade: (m, from, to) async {
+      m.createAll();
+    },
+  );
 
   Future<List<TodoThingDTO>> getAll() {
     return select(todoThing).get()
