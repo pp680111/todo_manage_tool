@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:todo_manage/model/todo_thing_progress/todo_thing_progress_db.dart';
+import 'package:todo_manage/widget/todo_thing/progress/todo_thing_progress_list_item.dart';
 
-import '../../model/todo_thing_progress/todo_thing_progress_dto.dart';
+import '../../../model/todo_thing_progress/todo_thing_progress_dto.dart';
 
 class TodoThingProgressList extends StatefulWidget {
   int todoThingId;
@@ -75,7 +75,7 @@ class _TodoThingProgressListState extends State<TodoThingProgressList> {
                   padding: const EdgeInsets.only(bottom: 16),
                   child: Column(
                     children: progressList.map((dto) {
-                      return _ProgressItem(dto);
+                      return ProgressItem(dto);
                     }).toList()
                   )
                 );
@@ -96,65 +96,3 @@ class _TodoThingProgressListState extends State<TodoThingProgressList> {
   }
 }
 
-class _ProgressItem extends StatelessWidget {
-  TodoThingProgressDTO progress;
-
-  _ProgressItem(this.progress);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        progress.content,
-        style: TextStyle(
-          fontSize: 14,
-        ),
-        maxLines: 10,
-      ),
-      trailing: _ProgressItemTrailing(progress),
-    );
-  }
-}
-
-class _ProgressItemTrailing extends StatefulWidget {
-  TodoThingProgressDTO progress;
-
-  _ProgressItemTrailing(this.progress);
-
-  @override
-  State<StatefulWidget> createState() {
-    return _ProgressItemTrailingState();
-  }
-}
-
-class _ProgressItemTrailingState extends State<_ProgressItemTrailing> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Checkbox(
-          value: widget.progress.isFinished,
-          onChanged: (value) {
-            setState(() {
-              widget.progress.isFinished = value!;
-            });
-          },
-          visualDensity: VisualDensity.comfortable,
-        ),
-        IconButton(
-          onPressed: () {
-
-          },
-          icon: const Icon(Icons.delete),
-          iconSize: 20,
-        )
-      ],
-    );
-  }
-}

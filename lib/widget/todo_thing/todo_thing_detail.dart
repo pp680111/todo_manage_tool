@@ -4,7 +4,7 @@ import 'package:todo_manage/model/todo_thing/todo_thing_db.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/utils/DateTimeUtils.dart';
 import 'package:todo_manage/widget/progressing_overlay.dart';
-import 'package:todo_manage/widget/todo_thing/todo_thing_progress_list.dart';
+import 'package:todo_manage/widget/todo_thing/progress/todo_thing_progress_list.dart';
 
 class TodoThingDetail extends StatefulWidget {
   TodoThingDTO? item;
