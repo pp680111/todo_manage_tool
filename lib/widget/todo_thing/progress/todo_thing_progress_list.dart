@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_manage/model/todo_thing_progress/todo_thing_progress_db.dart';
+import 'package:todo_manage/widget/todo_thing/progress/todo_thing_progress_form_dialog.dart';
 import 'package:todo_manage/widget/todo_thing/progress/todo_thing_progress_list_item.dart';
 
 import '../../../model/todo_thing_progress/todo_thing_progress_dto.dart';
@@ -42,11 +43,11 @@ class _TodoThingProgressListState extends State<TodoThingProgressList> {
                   fontSize: 16
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () {
-                  // TODO 弹出编辑框
+                  showDialog(context: context, builder: (context) => TodoThingProgressFormDialog(todoThingId : widget.todoThingId));
                 },
               )
             ],
