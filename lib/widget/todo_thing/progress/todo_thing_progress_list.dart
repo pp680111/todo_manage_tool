@@ -47,7 +47,10 @@ class _TodoThingProgressListState extends State<TodoThingProgressList> {
               IconButton(
                 icon: const Icon(Icons.add),
                 onPressed: () {
-                  showDialog(context: context, builder: (context) => TodoThingProgressFormDialog(todoThingId : widget.todoThingId));
+                  showDialog(context: context, builder: (context) => TodoThingProgressFormDialog(todoThingId : widget.todoThingId))
+                  .then((_) {
+                    setState(() {});
+                  });
                 },
               )
             ],
