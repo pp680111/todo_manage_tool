@@ -1,4 +1,3 @@
-import 'package:todo_manage/model/todo_thing/todo_thing_db.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
 
 class TodoThingDTO {
@@ -21,16 +20,6 @@ class TodoThingDTO {
     required this.updateTime,
     this.deadlineTime,
   });
-
-  TodoThingDTO.mapToDTO(TodoThingData data) :
-      id = data.id,
-      title = data.title,
-      detail = data.detail,
-      status = TodoThingState.fromKey(data.status),
-      categoryId = data.categoryId,
-      createTime = data.createTime,
-      updateTime = data.updateTime,
-      deadlineTime = data.deadlineTime;
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {};

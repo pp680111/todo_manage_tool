@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manage/model/todo_thing_progress/todo_thing_progress_db.dart';
+import 'package:todo_manage/model/app_database.dart';
 
 class TodoThingProgressFormDialog extends StatefulWidget {
   int todoThingId;
@@ -60,7 +60,7 @@ class _TodoThingProgressFormDialogState
       'todoThingId': widget.todoThingId,
       'content': _formContent,
     };
-    TodoThingProgressDb.instance.insert(formMap)
+    AppDatabase.instance.todoThingProgressDao.insert(formMap)
         .then((_) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("保存成功")));
           Navigator.pop(context);

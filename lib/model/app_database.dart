@@ -12,7 +12,9 @@ part 'app_database.g.dart';
 
 @DriftDatabase(tables: [TodoThing, TodoThingProgress], daos: [TodoThingDao, TodoThingProgressDao])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  static final AppDatabase instance = AppDatabase._internal();
+
+  AppDatabase._internal() : super(_openConnection());
 
   @override
   int get schemaVersion => 1;

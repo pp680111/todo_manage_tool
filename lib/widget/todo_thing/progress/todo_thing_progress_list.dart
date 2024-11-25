@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manage/model/todo_thing_progress/todo_thing_progress_db.dart';
+import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/widget/todo_thing/progress/todo_thing_progress_form_dialog.dart';
 import 'package:todo_manage/widget/todo_thing/progress/todo_thing_progress_list_item.dart';
 
@@ -20,7 +20,7 @@ class _TodoThingProgressListState extends State<TodoThingProgressList> {
 
   @override
   void initState() {
-    TodoThingProgressDb.instance.getProgress(widget.todoThingId)
+    AppDatabase.instance.todoThingProgressDao.getProgress(widget.todoThingId)
         .then((result) {
           progressList = result;
           setState(() {});
@@ -64,7 +64,7 @@ class _TodoThingProgressListState extends State<TodoThingProgressList> {
               )
             ),
             child: FutureBuilder<List<TodoThingProgressDTO>>(
-              future: TodoThingProgressDb.instance.getProgress(widget.todoThingId),
+              future: AppDatabase.instance.todoThingProgressDao.getProgress(widget.todoThingId),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Container();

@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:todo_manage/model/todo_thing/todo_thing_db.dart';
+import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/widget/prefetch_scroll_list_view.dart';
 import 'package:todo_manage/widget/search_bar_component.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_detail.dart';
@@ -41,7 +41,7 @@ class _TodoThingListState extends State<TodoThingList> {
   }
 
   Future<List<TodoThingDTO>> _getData(int pageIndex, int pageSize) async {
-    return TodoThingDb.instance.page(pageIndex, pageSize);
+    return AppDatabase.instance.todoThingDao.page(pageIndex, pageSize);
   }
 
   void invokeEditPage(BuildContext context, {TodoThingDTO? item}) async {

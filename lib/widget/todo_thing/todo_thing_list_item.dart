@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_manage/model/todo_thing/todo_thing_db.dart';
+import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/widget/prefetch_scroll_list_view.dart';
-import 'package:todo_manage/widget/todo_thing/todo_thing_detail.dart';
 
 import '../../model/todo_thing/todo_thing_dto.dart';
 
@@ -68,7 +67,7 @@ class _TrailingItem extends StatelessWidget {
           menuChildren: [
             MenuItemButton(
               onPressed: () {
-                TodoThingDb.instance.deleteById(id)
+                AppDatabase.instance.todoThingDao.deleteById(id)
                   .then((_) {
                     PrefetchScrollListViewController controller = Provider.of<PrefetchScrollListViewController<TodoThingDTO>>(context, listen: false);
                     controller.refresh();

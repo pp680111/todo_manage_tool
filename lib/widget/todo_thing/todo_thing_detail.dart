@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
-import 'package:todo_manage/model/todo_thing/todo_thing_db.dart';
+import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/utils/DateTimeUtils.dart';
 import 'package:todo_manage/widget/progressing_overlay.dart';
@@ -163,7 +163,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
   void _doSave(BuildContext context) {
     ProgressingOverlay.show(context, "保存中");
 
-    TodoThingDb.instance.insertOrUpdateFromMap(_formData)
+    AppDatabase.instance.todoThingDao.insertOrUpdateFromMap(_formData)
         .then((result) {
           ProgressingOverlay.success(context, "保存成功")
               .then((_) {
