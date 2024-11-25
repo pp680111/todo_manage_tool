@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:todo_manage/model/todo_thing_progress/todo_thing_progress.dart';
 import 'package:todo_manage/model/todo_thing_progress/todo_thing_progress_dto.dart';
@@ -12,7 +11,7 @@ part 'todo_thing_progress_db.g.dart';
 class TodoThingProgressDb extends _$TodoThingProgressDb {
   static final TodoThingProgressDb instance = TodoThingProgressDb._internal();
 
-  TodoThingProgressDb._internal() : super(DatabaseConstant.executor);
+  TodoThingProgressDb._internal() : super(driftDatabase(name: 'app_database'));
 
   @override
   int get schemaVersion => 2;

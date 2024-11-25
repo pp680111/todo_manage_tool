@@ -1,6 +1,6 @@
 
 import 'package:drift/drift.dart';
-import 'package:todo_manage/model/database.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
@@ -11,7 +11,7 @@ part 'todo_thing_db.g.dart';
 class TodoThingDb extends _$TodoThingDb {
   static final TodoThingDb instance = TodoThingDb._internal();
 
-  TodoThingDb._internal() : super(DatabaseConstant.executor);
+  TodoThingDb._internal() : super(driftDatabase(name: 'app_database'));
 
   @override
   int get schemaVersion => 1;
