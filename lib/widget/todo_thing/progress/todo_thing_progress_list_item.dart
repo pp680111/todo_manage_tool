@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_manage/model/app_database.dart';
+import 'package:todo_manage/widget/todo_thing/progress/progress_nofifier.dart';
 
 import '../../../model/todo_thing_progress/todo_thing_progress_dto.dart';
 
@@ -56,7 +59,16 @@ class _ProgressItemTrailingState extends State<_ProgressItemTrailing> {
         ),
         IconButton(
           onPressed: () {
-
+            AppDatabase.instance.todoThingProgressDao.deleteById(widget.progress.id)
+              .then((_) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("删除成功"), duration: Duration(milliseconds: 500)));
+                ProgressNotifier progressNotifier = Provider.of<ProgressNotifier>(context, listen: false);
+                progressNotifier.afterDelete();
+              })
+              .onError((e, stack) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("删除失败")));
+                print(e);
+              });
           },
           icon: const Icon(Icons.delete),
           iconSize: 20,

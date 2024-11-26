@@ -62,7 +62,7 @@ class _TodoThingProgressFormDialogState
     };
     AppDatabase.instance.todoThingProgressDao.insert(formMap)
         .then((_) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("保存成功")));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("保存成功"), duration: Duration(milliseconds: 500)));
           Navigator.pop(context, true);
         })
         .onError((ex, stack) {
