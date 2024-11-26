@@ -12,12 +12,11 @@ class TodoThingList extends StatefulWidget {
   State<StatefulWidget> createState() {
     return _TodoThingListState();
   }
-
 }
 
 class _TodoThingListState extends State<TodoThingList> {
   late PrefetchScrollListViewController<TodoThingDTO> _prefetchScrollListViewController;
-
+  String _searchKey = "";
 
   @override
   void initState() {
@@ -29,7 +28,7 @@ class _TodoThingListState extends State<TodoThingList> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SearchBarComponent(onSearchChange: () {}, onAddButtonPress: (ctx) => invokeEditPage(ctx)),
+        SearchBarComponent(onSearchChange: (text) => onSearchChange(text), onAddButtonPress: (ctx) => invokeEditPage(ctx)),
         Expanded(
           child: PrefetchScrollListView<TodoThingDTO>(
             _prefetchScrollListViewController,
@@ -41,7 +40,7 @@ class _TodoThingListState extends State<TodoThingList> {
   }
 
   Future<List<TodoThingDTO>> _getData(int pageIndex, int pageSize) async {
-    return AppDatabase.instance.todoThingDao.page(pageIndex, pageSize);
+    return AppDatabase.instance.todoThingDao.page(pageIndex, pageSize, _searchKey);
   }
 
   void invokeEditPage(BuildContext context, {TodoThingDTO? item}) async {
@@ -52,5 +51,10 @@ class _TodoThingListState extends State<TodoThingList> {
     if (hasChanged != null && hasChanged) {
       _prefetchScrollListViewController.refresh();
     }
+  }
+
+  void onSearchChange(String text) {
+    _searchKey = text;
+    _prefetchScrollListViewController.refresh();
   }
 }

@@ -11,9 +11,6 @@ class SearchBarComponent extends StatefulWidget {
   State<StatefulWidget> createState() {
     return _SearchBarComponentState();
   }
-
-
-
 }
 
 class _SearchBarComponentState extends State<SearchBarComponent> {
@@ -24,7 +21,11 @@ class _SearchBarComponentState extends State<SearchBarComponent> {
           child: Container(
               padding: const EdgeInsets.only(top: 8),
               height: 50,
-              child: CupertinoSearchTextField()
+              child: CupertinoSearchTextField(
+                onChanged: (text) {
+                  widget.onSearchChange(text);
+                },
+              )
           )
       ),
       Container(

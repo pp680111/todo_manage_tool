@@ -11,11 +11,15 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixi
 
   TodoThingDao(super.database);
 
-  Future<List<TodoThingDTO>> page(int pageIndex, int pageSize) {
+  Future<List<TodoThingDTO>> page(int pageIndex, int pageSize, String? searchKey) {
     int start = (pageIndex <= 0 ? 0 : pageIndex - 1) * pageSize;
-    return (select(todoThing)..limit(pageSize, offset: start)).get()
+    SimpleSelectStatement<TodoThing, TodoThingData> statement = select(todoThing);
+    statement.limit(pageSize, offset: start);
+    if (searchKey != null && searchKey.isNotEmpty) {
+      statement.where((t) => (t.title.like('%$searchKey%') | t.detail.like('%$searchKey%')));
+    }
+    return statement.get()
         .then((list) => list.map((e) => _mapToDTO(e)).toList());
-
   }
 
   TodoThingDTO _mapToDTO(TodoThingData data) {
