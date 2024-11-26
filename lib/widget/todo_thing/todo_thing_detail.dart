@@ -3,7 +3,6 @@ import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/utils/DateTimeUtils.dart';
-import 'package:todo_manage/widget/progressing_overlay.dart';
 import 'package:todo_manage/widget/todo_thing/progress/todo_thing_progress_list.dart';
 
 class TodoThingDetail extends StatefulWidget {
@@ -161,19 +160,15 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
   }
 
   void _doSave(BuildContext context) {
-    ProgressingOverlay.show(context, "保存中");
-
     AppDatabase.instance.todoThingDao.insertOrUpdateFromMap(_formData)
-        .then((result) {
-          ProgressingOverlay.success(context, "保存成功")
-              .then((_) {
-                 Navigator.pop(context, true);
-              });
-        }).onError((e, stackTrace) {
-          ProgressingOverlay.error(context, "保存失败")
-              .then((_) {
-                  Navigator.pop(context, false);
-              });
+        .then((result) async {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("保存成功"), duration: Duration(milliseconds: 500)));
+          await Future.delayed(const Duration(milliseconds: 200));
+          Navigator.pop(context, true);
+    }).onError((e, stackTrace) async {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("保存失败")));
+          await Future.delayed(const Duration(milliseconds: 200));
+          Navigator.pop(context, false);
         });
   }
 }
