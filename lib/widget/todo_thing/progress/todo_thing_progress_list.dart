@@ -19,18 +19,6 @@ class TodoThingProgressList extends StatefulWidget {
 class _TodoThingProgressListState extends State<TodoThingProgressList> {
   List<TodoThingProgressDTO> progressList = [];
 
-
-  @override
-  void initState() {
-    AppDatabase.instance.todoThingProgressDao.getProgress(widget.todoThingId)
-        .then((result) {
-          progressList = result;
-          setState(() {});
-        }).onError((e, stackTrace) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("数据加载失败")));
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
