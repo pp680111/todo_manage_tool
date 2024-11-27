@@ -12,15 +12,51 @@ class ProgressItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        progress.content,
-        style: const TextStyle(
-          fontSize: 14,
+    return SelectableRegion(
+      focusNode: FocusNode(),
+      selectionControls: materialTextSelectionControls,
+      child: ListTile(
+        title: GestureDetector(
+          child: Text(
+            progress.content,
+            style: const TextStyle(
+                fontSize: 14,
+                overflow: TextOverflow.ellipsis
+            ),
+            maxLines: 2,
+          ),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 800,
+                        child: TextField(
+                          controller: TextEditingController(text: progress.content),
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            label: Text(
+                              "内容",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          maxLines: 10,
+                          readOnly: true,
+                        )
+                      ),
+                    ],
+                  ),
+                );
+              }
+            );
+          },
         ),
-        maxLines: 10,
-      ),
-      trailing: _ProgressItemTrailing(progress),
+        trailing: _ProgressItemTrailing(progress),
+      )
     );
   }
 }
