@@ -86,9 +86,10 @@ class _ProgressItemTrailingState extends State<_ProgressItemTrailing> {
         Checkbox(
           value: widget.progress.isFinished,
           onChanged: (value) {
-            setState(() {
               widget.progress.isFinished = value!;
-            });
+              AppDatabase.instance.todoThingProgressDao.updateIsFinished(widget.progress.id,
+                  widget.progress.isFinished);
+              Provider.of<ProgressNotifier>(context, listen: false).refreshList();
           },
           visualDensity: VisualDensity.comfortable,
         ),
