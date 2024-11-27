@@ -12,12 +12,17 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixi
   TodoThingDao(super.database);
 
   Future<List<TodoThingDTO>> page(int pageIndex, int pageSize, String? searchKey) {
-    int start = (pageIndex <= 0 ? 0 : pageIndex - 1) * pageSize;
     SimpleSelectStatement<TodoThing, TodoThingData> statement = select(todoThing);
+
+    int start = (pageIndex <= 0 ? 0 : pageIndex - 1) * pageSize;
     statement.limit(pageSize, offset: start);
+
     if (searchKey != null && searchKey.isNotEmpty) {
       statement.where((t) => (t.title.like('%$searchKey%') | t.detail.like('%$searchKey%')));
     }
+
+    statement.orderBy([(t) => OrderingTerm.asc(t.status)]);
+
     return statement.get()
         .then((list) => list.map((e) => _mapToDTO(e)).toList());
   }

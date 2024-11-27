@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
+import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
 import 'package:todo_manage/utils/DateTimeUtils.dart';
 import 'package:todo_manage/widget/todo_thing/progress/todo_thing_progress_list.dart';
 
@@ -41,28 +42,48 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              height: 80,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: TextField(
-                controller: TextEditingController(text: _formData["title"]),
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  label: Text(
-                    "标题",
-                    style: TextStyle(
-                      color: Colors.grey
+            Row(
+              children: [
+                Container(
+                  width: 800,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: TextField(
+                    controller: TextEditingController(text: _formData["title"]),
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      label: Text(
+                        "标题",
+                        style: TextStyle(
+                            color: Colors.grey
+                        ),
+                      ),
                     ),
-                  ),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20
+                    ),
+                    onChanged: (text) {
+                      _formData["title"] = text;
+                    },
+                  )
                 ),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20
-                ),
-                onChanged: (text) {
-                  _formData["title"] = text;
-                },
-              )
+                DropdownMenu<TodoThingState>(
+                  initialSelection: _formData['status'],
+                  requestFocusOnTap: true,
+                  enableSearch: false,
+                  label: const Text("状态"),
+                  onSelected: (TodoThingState? state) {
+                    _formData['status'] = state;
+                  },
+                  dropdownMenuEntries: TodoThingState.values
+                    .map<DropdownMenuEntry<TodoThingState>>((state) {
+                      return DropdownMenuEntry(
+                        value: state,
+                        label: state.text,
+                      );
+                    }).toList(),
+                )
+              ],
             ),
             Container(
               height: 200,

@@ -11,8 +11,12 @@ class TodoThingProgressDao extends DatabaseAccessor<AppDatabase> with _$TodoThin
   TodoThingProgressDao(super.database);
 
   Future<List<TodoThingProgressDTO>> getProgress(int todoThingId) {
-    return (select(todoThingProgress)..where((t) => t.todoThingId.equals(todoThingId)))
-        .get()
+    SimpleSelectStatement<TodoThingProgress, TodoThingProgressData> statement = select(todoThingProgress);
+    statement.where((t) => t.todoThingId.equals(todoThingId));
+    statement.orderBy([(t) => OrderingTerm.asc(t.isFinished),
+          (t) => OrderingTerm.asc(t.id)]);
+
+    return statement.get()
         .then((result) => result.map((p) => _mapToDTO(p)).toList());
   }
 
@@ -27,6 +31,10 @@ class TodoThingProgressDao extends DatabaseAccessor<AppDatabase> with _$TodoThin
     } catch (e) {
       return Future.error(e.toString());
     }
+  }
+
+  Future<int> updateIsFinished(int id, bool isFinished) {
+    return (update(todoThingProgress)..where((t) => t.id.equals(id))).write(TodoThingProgressCompanion(isFinished: Value(isFinished)));
   }
 
   void _initDefValForFormMap(Map<String, dynamic> formMap) {
