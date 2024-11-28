@@ -44,44 +44,45 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
           children: [
             Row(
               children: [
-                Container(
-                  width: 800,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: TextField(
-                    controller: TextEditingController(text: _formData["title"]),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      label: Text(
-                        "标题",
-                        style: TextStyle(
-                            color: Colors.grey
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: TextField(
+                      controller: TextEditingController(text: _formData["title"]),
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        label: Text(
+                          "标题",
+                          style: TextStyle(
+                              color: Colors.grey
+                          ),
                         ),
                       ),
-                    ),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20
-                    ),
-                    onChanged: (text) {
-                      _formData["title"] = text;
-                    },
-                  )
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16
+                      ),
+                      onChanged: (text) {
+                        _formData["title"] = text;
+                      },
+                    )
+                  ),
                 ),
-                DropdownMenu<TodoThingState>(
-                  initialSelection: _formData['status'],
-                  requestFocusOnTap: true,
-                  enableSearch: false,
-                  label: const Text("状态"),
-                  onSelected: (TodoThingState? state) {
-                    _formData['status'] = state;
-                  },
-                  dropdownMenuEntries: TodoThingState.values
-                    .map<DropdownMenuEntry<TodoThingState>>((state) {
-                      return DropdownMenuEntry(
+                Container(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: DropdownMenu<TodoThingState>(
+                    label: const Text("状态"),
+                    initialSelection: _formData['status'],
+                    dropdownMenuEntries: TodoThingState.values.map<DropdownMenuEntry<TodoThingState>>((state) {
+                      return DropdownMenuEntry<TodoThingState>(
                         value: state,
                         label: state.text,
                       );
                     }).toList(),
+                    onSelected: (state) {
+                      _formData['status'] = state;
+                    },
+                  )
                 )
               ],
             ),

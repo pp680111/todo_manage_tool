@@ -21,7 +21,7 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixi
       statement.where((t) => (t.title.like('%$searchKey%') | t.detail.like('%$searchKey%')));
     }
 
-    statement.orderBy([(t) => OrderingTerm.asc(t.status)]);
+    statement.orderBy([(t) => OrderingTerm.asc(t.status), (t) => OrderingTerm.desc(t.createTime)]);
 
     return statement.get()
         .then((list) => list.map((e) => _mapToDTO(e)).toList());
