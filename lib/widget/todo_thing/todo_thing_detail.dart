@@ -38,6 +38,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
     return Scaffold(
       appBar: AppBar(
         title: widget.item == null ? const Text("编辑") : const Text("详情"),
+        surfaceTintColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
         child: Column(
