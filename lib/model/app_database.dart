@@ -9,9 +9,12 @@ import 'package:todo_manage/model/todo_thing/todo_thing_dao.dart';
 import 'package:todo_manage/model/todo_thing_progress/todo_thing_progress.dart';
 import 'package:todo_manage/model/todo_thing_progress/todo_thing_progress_dao.dart';
 
+import 'category/category_dao.dart';
+import 'category/category.dart' as my_category;
+
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [TodoThing, TodoThingProgress], daos: [TodoThingDao, TodoThingProgressDao])
+@DriftDatabase(tables: [TodoThing, TodoThingProgress, my_category.Category], daos: [TodoThingDao, TodoThingProgressDao, CategoryDao])
 class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
