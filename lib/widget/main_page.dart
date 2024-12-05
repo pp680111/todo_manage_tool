@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:todo_manage/widget/search_bar_component.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_list.dart';
 
+import 'category/category_list.dart';
+
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
 
@@ -51,8 +53,7 @@ class _MainPageState extends State<MainPage> {
   Widget _switchContainerComponent() {
     return switch (_selectedIndex) {
       0 => TodoThingList(),
-      1 => Placeholder(child: Text("Category"),),
-      // TODO: Handle this case.
+      1 => CategoryList(),
       int() => throw UnimplementedError(),
     };
   }
