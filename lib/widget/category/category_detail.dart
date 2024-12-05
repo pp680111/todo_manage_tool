@@ -41,61 +41,63 @@ class _CategoryDetailState extends State<CategoryDetail> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Container(
-            //   height: 80,
-            //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //     child: TextField(
-            //       controller: TextEditingController(text: _formData["name"]),
-            //       decoration: const InputDecoration(
-            //         border: OutlineInputBorder(),
-            //         label: Text(
-            //           "名称",
-            //           style: TextStyle(
-            //               color: Colors.grey
-            //           ),
-            //         ),
-            //       ),
-            //       style: const TextStyle(
-            //           fontWeight: FontWeight.bold,
-            //           fontSize: 16
-            //       ),
-            //       onChanged: (text) {
-            //         _formData["name"] = text;
-            //       },
-            //     )
-            // ),
-            // if (!insertMode)
-            //   Expanded(
-            //     child: Container(
-            //       height: 80,
-            //       child: TextField(
-            //         controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["createTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
-            //         decoration: const InputDecoration(
-            //             border: OutlineInputBorder(),
-            //             label: Text("创建时间")
-            //         ),
-            //         readOnly: true,
-            //       ),
-            //     ),
-            //   ),
-            // if (!insertMode)
-            //   Expanded(
-            //     child: Container(
-            //       height: 80,
-            //       padding: EdgeInsets.only(left: insertMode ? 0 : 8),
-            //       child: TextField(
-            //         controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["updateTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
-            //         decoration: const InputDecoration(
-            //             border: OutlineInputBorder(),
-            //             label: Text("更新时间")
-            //         ),
-            //         onTap: () {_showDatePicker(context, _formData["updateTime"]);},
-            //         onChanged: (time) {
-            //           _formData["updateTime"] = time;
-            //         },
-            //       ),
-            //     ),
-            //   ),
+            Container(
+              height: 80,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextField(
+                controller: TextEditingController(text: _formData["name"]),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  label: Text(
+                    "名称",
+                    style: TextStyle(
+                        color: Colors.grey
+                    ),
+                  ),
+                ),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16
+                ),
+                onChanged: (text) {
+                  _formData["name"] = text;
+                },
+              )
+            ),
+            if (!insertMode)
+              Container(
+                height: 80,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: TextField(
+                          controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["createTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              label: Text("创建时间")
+                          )
+                        )
+                      )
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: TextField(
+                          controller: TextEditingController(text: DateTimeUtils.formatDateTime(_formData["updateTime"], DateTimeUtils.yyyyMMddHHmmFormat)),
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              label: Text("更新时间")
+                          ),
+                          onTap: () {_showDatePicker(context, _formData["updateTime"]);},
+                        )
+                      )
+                    )
+                  ]
+                )
+              )
           ],
         ),
       ),
