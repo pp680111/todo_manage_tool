@@ -26,9 +26,9 @@ class AppDatabase extends _$AppDatabase {
 
       String path = "";
       if (kDebugMode) {
-        path = '${dbFolder.path}/debug/app_database.sqlite';
+        path = '${dbFolder.path}/zst_todo_tools/debug/app_database.sqlite';
       } else if (kReleaseMode) {
-        path = '${dbFolder.path}/release/app_database.sqlite';
+        path = '${dbFolder.path}/zst_todo_tools/release/app_database.sqlite';
       } else {
         throw Exception("Unknown build mode");
       }
