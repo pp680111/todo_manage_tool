@@ -6,6 +6,9 @@ import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
 import 'package:todo_manage/utils/DateTimeUtils.dart';
 import 'package:todo_manage/widget/todo_thing/progress/todo_thing_progress_list.dart';
 
+import '../../model/category/category_dto.dart';
+import '../category/category_select_dialog.dart';
+
 class TodoThingDetail extends StatefulWidget {
   TodoThingDTO? item;
 
@@ -22,6 +25,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
   Map<String, dynamic> _formData = {};
   bool insertMode = true;
 
+  // 获取所有分类
   @override
   void initState() {
     super.initState();
@@ -86,6 +90,35 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                   )
                 )
               ],
+            ),
+            Container(
+              height: 80,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextField(
+                controller: TextEditingController(text: _formData["categoryName"]),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  label: Text(
+                    "所属类别",
+                    style: TextStyle(
+                        color: Colors.grey
+                    ),
+                    maxLines: 1,
+                  ),
+                ),
+                onTap: () {
+                  showDialog(context: context, builder: (context) {
+                    return const CategorySelectDialog();
+                  }).then((category) {
+                    if (category != null) {
+                      setState(() {
+                        _formData["categoryId"] = category.id;
+                        _formData["categoryName"] = category.name;
+                      });
+                    }
+                  });
+                },
+              ),
             ),
             Container(
               height: 200,

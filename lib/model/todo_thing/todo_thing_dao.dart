@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
+import 'package:todo_manage/model/todo_thing/todo_thing_dto_mapper.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
 
 part 'todo_thing_dao.g.dart';
@@ -24,20 +25,7 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixi
     statement.orderBy([(t) => OrderingTerm.asc(t.status), (t) => OrderingTerm.desc(t.createTime)]);
 
     return statement.get()
-        .then((list) => list.map((e) => _mapToDTO(e)).toList());
-  }
-
-  TodoThingDTO _mapToDTO(TodoThingData data) {
-    return TodoThingDTO(
-      id: data.id,
-      title: data.title,
-      detail: data.detail,
-      status: TodoThingState.fromKey(data.status),
-      categoryId: data.categoryId,
-      createTime: data.createTime,
-      updateTime: data.updateTime,
-      deadlineTime: data.deadlineTime
-    );
+        .then((list) => TodoThingDTOMapper.mapToDTOList(list));
   }
 
   Future insertOrUpdateFromMap(Map<String, dynamic> formMap) {

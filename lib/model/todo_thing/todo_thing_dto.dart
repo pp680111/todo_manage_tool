@@ -6,6 +6,7 @@ class TodoThingDTO {
   String? detail;
   TodoThingState status;
   int? categoryId;
+  String? categoryName;
   DateTime createTime;
   DateTime updateTime;
   DateTime? deadlineTime;
@@ -16,6 +17,7 @@ class TodoThingDTO {
     this.detail,
     required this.status,
     this.categoryId,
+    this.categoryName,
     required this.createTime,
     required this.updateTime,
     this.deadlineTime,
@@ -32,6 +34,9 @@ class TodoThingDTO {
     map['status'] = status;
     if (categoryId != null) {
       map['categoryId'] = categoryId;
+    }
+    if (categoryName != null) {
+      map['categoryName'] = categoryName;
     }
     map['createTime'] = createTime;
     map['updateTime'] = updateTime;

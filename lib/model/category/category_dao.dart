@@ -22,11 +22,19 @@ class CategoryDao extends DatabaseAccessor<AppDatabase> with _$CategoryDaoMixin 
       statement.where((t) => t.name.contains(searchKey));
     }
 
-    statement.orderBy([(t) => OrderingTerm.desc(t.createTime)]);
+    statement.orderBy([(t) => OrderingTerm.asc(t.createTime)]);
 
     return statement.get()
         .then((result) => result.map((c) => _mapToDTO(c)).toList());
 
+  }
+  
+  Future<List<CategoryDTO>> selectById(List<int> ids) {
+    return (select(category)..where((t) => t.id.isIn(ids)))
+        .get()
+        .then((l) {
+          return l.map((c) => _mapToDTO(c)).toList();
+        });
   }
 
   Future<int> insertOrUpdateFromMap(Map<String, dynamic> formMap) {
