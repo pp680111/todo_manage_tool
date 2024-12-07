@@ -66,7 +66,7 @@ class _CategoryDetailState extends State<CategoryDetail> {
             ),
             if (!insertMode)
               Container(
-                height: 80,
+                height: 64,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [

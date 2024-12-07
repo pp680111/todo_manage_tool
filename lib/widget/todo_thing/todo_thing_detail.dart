@@ -93,7 +93,7 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
             ),
             Container(
               height: 80,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: TextField(
                 controller: TextEditingController(text: _formData["categoryName"]),
                 decoration: const InputDecoration(

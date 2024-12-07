@@ -22,6 +22,7 @@ class _SearchBarComponentState extends State<SearchBarComponent> {
               padding: const EdgeInsets.only(top: 8),
               height: 50,
               child: CupertinoSearchTextField(
+                placeholder: "请输入关键词",
                 onChanged: (text) {
                   widget.onSearchChange(text);
                 },
