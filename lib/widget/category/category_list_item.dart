@@ -22,21 +22,22 @@ class CategoryListItem extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      onTap: () {
-        if (onTap != null) {
-          onTap!(context, item: item);
-        }
-      },
-      trailing: _TrailingItem(id: item.id),
+      trailing: _TrailingItem(id: item.id, displayDetail: _displayDetail),
     );
   }
 
+  void _displayDetail(BuildContext context) {
+    if (onTap != null) {
+      onTap!(context, item: item);
+    }
+  }
 }
 
 class _TrailingItem extends StatelessWidget {
   int id;
+  void Function(BuildContext ctx)? displayDetail;
 
-  _TrailingItem({super.key, required this.id});
+  _TrailingItem({super.key, required this.id, this.displayDetail});
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +58,15 @@ class _TrailingItem extends StatelessWidget {
             );
           },
           menuChildren: [
+            MenuItemButton(
+              child: const Text("详情"),
+              onPressed: () {
+                if (displayDetail != null) {
+                  displayDetail!(context);
+                }
+              },
+              requestFocusOnHover: false,
+            ),
             MenuItemButton(
               onPressed: () {
                 AppDatabase.instance.categoryDao.deleteById(id)
