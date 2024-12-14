@@ -10,7 +10,7 @@ class SearchBarComponent extends StatefulWidget {
   SearchBarComponent({super.key,
     required this.onSearchChange,
     required this.onAddButtonPress,
-    this.displayBackwardButton = true,
+    this.displayBackwardButton = false,
     this.onBackwardButtonPress});
 
   @override

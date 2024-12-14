@@ -22,6 +22,9 @@ class CategoryListItem extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
+      onTap: () {
+        _displayDetail(context);
+      },
       trailing: _TrailingItem(id: item.id, displayDetail: _displayDetail),
     );
   }
@@ -58,15 +61,6 @@ class _TrailingItem extends StatelessWidget {
             );
           },
           menuChildren: [
-            MenuItemButton(
-              child: const Text("详情"),
-              onPressed: () {
-                if (displayDetail != null) {
-                  displayDetail!(context);
-                }
-              },
-              requestFocusOnHover: false,
-            ),
             MenuItemButton(
               onPressed: () {
                 AppDatabase.instance.categoryDao.deleteById(id)
