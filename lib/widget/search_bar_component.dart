@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 class SearchBarComponent extends StatefulWidget {
   Function onSearchChange;
   Function onAddButtonPress;
-  bool displayBackwardButton;
-  void Function(BuildContext ctx)? onBackwardButtonPress;
+  bool enableCustomFilter;
+  void Function(BuildContext ctx)? onCustomFilterPress;
 
   SearchBarComponent({super.key,
     required this.onSearchChange,
     required this.onAddButtonPress,
-    this.displayBackwardButton = false,
-    this.onBackwardButtonPress});
+    this.enableCustomFilter = false,
+    this.onCustomFilterPress});
 
   @override
   State<StatefulWidget> createState() {
@@ -24,18 +24,6 @@ class _SearchBarComponentState extends State<SearchBarComponent> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (widget.displayBackwardButton)
-          Container(
-            padding: const EdgeInsets.only(top: 10),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded, size: 36),
-              onPressed: () {
-                if (widget.onBackwardButtonPress != null) {
-                  widget.onBackwardButtonPress!(context);
-                }
-              },
-            ),
-          ),
         Expanded(
             child: Container(
                 padding: const EdgeInsets.only(top: 8),
@@ -48,6 +36,16 @@ class _SearchBarComponentState extends State<SearchBarComponent> {
                 )
             )
         ),
+        if (widget.enableCustomFilter)
+          Container(
+            padding: const EdgeInsets.only(top: 10),
+            child: IconButton(
+              icon: const Icon(Icons.filter_alt_sharp, size: 34,),
+              onPressed: () {
+                widget.onCustomFilterPress?.call(context);
+              },
+            )
+          ),
         Container(
             padding: const EdgeInsets.only(top: 10),
             child: IconButton(

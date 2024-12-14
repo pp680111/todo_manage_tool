@@ -61,13 +61,13 @@ class _TodoThingProgressFormDialogState
       'content': _formContent,
     };
     AppDatabase.instance.todoThingProgressDao.insert(formMap)
-        .then((_) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("保存成功"), duration: Duration(milliseconds: 500)));
-          Navigator.pop(context, true);
-        })
-        .onError((ex, stack) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("保存失败")));
-          Navigator.pop(context, false);
-        });
+      .then((_) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("保存成功"), duration: Duration(milliseconds: 500)));
+        Navigator.pop(context, true);
+      })
+      .onError((ex, stack) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("保存失败")));
+        Navigator.pop(context, false);
+      });
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/widget/prefetch_scroll_list_view.dart';
 import 'package:todo_manage/widget/search_bar_component.dart';
+import 'package:todo_manage/widget/todo_thing/filter_dialog.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_detail.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_list_item.dart';
 
@@ -28,7 +30,12 @@ class _TodoThingListState extends State<TodoThingList> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SearchBarComponent(onSearchChange: (text) => onSearchChange(text), onAddButtonPress: (ctx) => invokeEditPage(ctx)),
+        SearchBarComponent(
+          onSearchChange: (text) => onSearchChange(text),
+          onAddButtonPress: (ctx) => invokeEditPage(ctx),
+          enableCustomFilter: true,
+          onCustomFilterPress: (ctx) => _invokeFilterDialog(ctx),
+        ),
         Expanded(
           child: PrefetchScrollListView<TodoThingDTO>(
             _prefetchScrollListViewController,
@@ -37,10 +44,6 @@ class _TodoThingListState extends State<TodoThingList> {
         )
       ],
     );
-  }
-
-  Future<List<TodoThingDTO>> _getData(int pageIndex, int pageSize) async {
-    return AppDatabase.instance.todoThingDao.page(pageIndex, pageSize, _listParams);
   }
 
   void invokeEditPage(BuildContext context, {TodoThingDTO? item}) async {
@@ -56,5 +59,18 @@ class _TodoThingListState extends State<TodoThingList> {
   void onSearchChange(String text) {
     _listParams['searchKey'] = text;
     _prefetchScrollListViewController.refresh();
+  }
+
+  Future<List<TodoThingDTO>> _getData(int pageIndex, int pageSize) async {
+    return AppDatabase.instance.todoThingDao.page(pageIndex, pageSize, _listParams);
+  }
+
+  void _invokeFilterDialog(BuildContext ctx) {
+    showDialog(
+      context: ctx,
+      builder: (context) => FilterDialog(filter: _listParams)
+    ).then((_) {
+      _prefetchScrollListViewController.refresh();
+    });
   }
 }
