@@ -3,6 +3,7 @@ import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_dto_mapper.dart';
+import 'package:todo_manage/model/todo_thing/todo_thing_query_builder.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
 
 part 'todo_thing_dao.g.dart';
@@ -12,17 +13,11 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixi
 
   TodoThingDao(super.database);
 
-  Future<List<TodoThingDTO>> page(int pageIndex, int pageSize, String? searchKey) {
-    SimpleSelectStatement<TodoThing, TodoThingData> statement = select(todoThing);
+  Future<List<TodoThingDTO>> page(int pageIndex, int pageSize, Map<String, dynamic>? params) {
+    SimpleSelectStatement<TodoThing, TodoThingData> statement = TodoThingQueryBuilder.buildStatement(params);
 
     int start = (pageIndex <= 0 ? 0 : pageIndex - 1) * pageSize;
     statement.limit(pageSize, offset: start);
-
-    if (searchKey != null && searchKey.isNotEmpty) {
-      statement.where((t) => (t.title.like('%$searchKey%') | t.detail.like('%$searchKey%')));
-    }
-
-    statement.orderBy([(t) => OrderingTerm.asc(t.status), (t) => OrderingTerm.desc(t.createTime)]);
 
     return statement.get()
         .then((list) => TodoThingDTOMapper.mapToDTOList(list));

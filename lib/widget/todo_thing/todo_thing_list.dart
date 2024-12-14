@@ -16,7 +16,7 @@ class TodoThingList extends StatefulWidget {
 
 class _TodoThingListState extends State<TodoThingList> {
   late PrefetchScrollListViewController<TodoThingDTO> _prefetchScrollListViewController;
-  String _searchKey = "";
+  Map<String, dynamic> _listParams = {};
 
   @override
   void initState() {
@@ -40,7 +40,7 @@ class _TodoThingListState extends State<TodoThingList> {
   }
 
   Future<List<TodoThingDTO>> _getData(int pageIndex, int pageSize) async {
-    return AppDatabase.instance.todoThingDao.page(pageIndex, pageSize, _searchKey);
+    return AppDatabase.instance.todoThingDao.page(pageIndex, pageSize, _listParams);
   }
 
   void invokeEditPage(BuildContext context, {TodoThingDTO? item}) async {
@@ -54,7 +54,7 @@ class _TodoThingListState extends State<TodoThingList> {
   }
 
   void onSearchChange(String text) {
-    _searchKey = text;
+    _listParams['searchKey'] = text;
     _prefetchScrollListViewController.refresh();
   }
 }
