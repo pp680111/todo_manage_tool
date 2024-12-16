@@ -2,6 +2,7 @@ import 'package:drop_down_search_field/drop_down_search_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:todo_manage/model/app_database.dart';
+import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
 
 class FilterDialog extends StatefulWidget {
   Map<String, dynamic> filter;
@@ -60,6 +61,23 @@ class _FilterDialogState extends State<FilterDialog> {
               },
               isMultiSelectDropdown: false,
               displayAllSuggestionWhenTap: false,
+            ),
+            Container(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: DropdownMenu<TodoThingState>(
+                expandedInsets: const EdgeInsets.only(top: 8.0),
+                label: const Text("状态", style: TextStyle(color: Colors.grey)),
+                inputDecorationTheme: const InputDecorationTheme(
+                ),
+                trailingIcon: const Icon(null, blendMode: BlendMode.clear),
+                selectedTrailingIcon: const Icon(null),
+                dropdownMenuEntries: TodoThingState.values.map((s) {
+                  return DropdownMenuEntry(value: s, label: s.text);
+                }).toList(),
+                onSelected: (state) {
+                  widget.filter['status'] = state?.index;
+                },
+              ),
             )
           ],
         ),

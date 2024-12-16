@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/widget/prefetch_scroll_list_view.dart';
 import 'package:todo_manage/widget/search_bar_component.dart';
 import 'package:todo_manage/widget/todo_thing/filter_dialog.dart';
+import 'package:todo_manage/widget/todo_thing/refresh_notifier.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_detail.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_list_item.dart';
 
@@ -28,21 +30,32 @@ class _TodoThingListState extends State<TodoThingList> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SearchBarComponent(
-          onSearchChange: (text) => onSearchChange(text),
-          onAddButtonPress: (ctx) => invokeEditPage(ctx),
-          enableCustomFilter: true,
-          onCustomFilterPress: (ctx) => _invokeFilterDialog(ctx),
-        ),
-        Expanded(
-          child: PrefetchScrollListView<TodoThingDTO>(
-            _prefetchScrollListViewController,
-            (i) => TodoThingListItem(item: i, onTap: invokeEditPage)
+    return ChangeNotifierProvider(
+      create: (ctx) => RefreshNotifier(),
+      child: Column(
+        children: [
+          SearchBarComponent(
+            onSearchChange: (text) => onSearchChange(text),
+            onAddButtonPress: (ctx) => invokeEditPage(ctx),
+            enableCustomFilter: true,
+            onCustomFilterPress: (ctx) => _invokeFilterDialog(ctx),
+          ),
+          Expanded(
+              child: PrefetchScrollListView<TodoThingDTO>(
+                  _prefetchScrollListViewController,
+                      (i) => TodoThingListItem(item: i, onTap: invokeEditPage)
+              )
+          ),
+          Consumer<RefreshNotifier>(
+            builder: (ctx, value, child) {
+              _prefetchScrollListViewController.refresh();
+              return Container(
+                height: 0,
+              );
+            }
           )
-        )
-      ],
+        ],
+      ),
     );
   }
 

@@ -37,6 +37,15 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixi
     }
   }
 
+  Future updateState(int id, TodoThingState state) {
+    try {
+      return (update(todoThing)..where((t) => t.id.equals(id)))
+          .write(TodoThingCompanion(status: Value(state.key)));
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
+
   Future<int> deleteById(int id) {
     return (delete(todoThing)..where((t) => t.id.equals(id))).go();
   }

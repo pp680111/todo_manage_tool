@@ -23,6 +23,9 @@ class TodoThingQueryBuilder {
         case 'categoryId':
           statement.where((t) => t.categoryId.equals(entry.value));
           break;
+        case 'status':
+          statement.where((t) => t.status.equals(entry.value));
+          break;
       }
     }
 
