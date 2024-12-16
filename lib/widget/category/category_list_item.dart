@@ -18,8 +18,7 @@ class CategoryListItem extends StatelessWidget {
       title: Text(
         item.name,
         style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
+          fontSize: 16,
         ),
       ),
       onTap: () {

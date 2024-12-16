@@ -19,8 +19,7 @@ class TodoThingListItem extends StatelessWidget {
       title: Text(
         item.title,
         style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
+          fontSize: 16,
         ),
       ),
       subtitle: Text(
