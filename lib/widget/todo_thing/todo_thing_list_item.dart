@@ -29,7 +29,7 @@ class _TodoThingListItemState extends State<TodoThingListItem> {
         ),
       ),
       subtitle: Text(
-        widget.item.detail != null ? widget.item.detail!.trim() : "",
+        widget.item.categoryName != null ? widget.item.categoryName!.trim() : "",
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(
           color: Colors.grey,
@@ -108,7 +108,7 @@ class _TrailingItem extends StatelessWidget {
         );
       case TodoThingState.EXPIRED:
         return const Icon(
-          Icons.circle_rounded,
+          Icons.cancel,
           color: Colors.red,
         );
     }
