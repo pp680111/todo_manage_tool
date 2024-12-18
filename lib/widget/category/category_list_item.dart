@@ -14,7 +14,8 @@ class CategoryListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.all(1),
+      minTileHeight: 60,
+      contentPadding: const EdgeInsets.only(left: 10, right: 5),
       title: Text(
         item.name,
         style: const TextStyle(
