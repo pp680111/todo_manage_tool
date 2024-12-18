@@ -106,7 +106,14 @@ class _PrefetchScrollListViewState<T> extends State<PrefetchScrollListView> {
       child: ListenableBuilder(
         listenable: _controller,
         builder: (context, _) {
-          return ListView.builder(
+          return ListView.separated(
+            separatorBuilder: (context, index) {
+              return Divider(
+                color: Colors.grey.withAlpha(50),
+                height: 2,
+                thickness: 2,
+              );
+            },
             controller: _scrollController,
             itemCount: _controller._items.length + (_controller.hasNextPage ? 1 : 0),
             itemBuilder: (context, index) {

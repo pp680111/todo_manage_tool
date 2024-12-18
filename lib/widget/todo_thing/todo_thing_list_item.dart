@@ -21,22 +21,23 @@ class _TodoThingListItemState extends State<TodoThingListItem> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.all(1),
+      minTileHeight: 65,
+      contentPadding: const EdgeInsets.only(left: 10, right: 5),
       title: Text(
         widget.item.title,
         style: const TextStyle(
           fontSize: 16,
         ),
       ),
-      subtitle: Text(
-        widget.item.categoryName != null ? widget.item.categoryName!.trim() : "",
+      subtitle: widget.item.categoryName != null ? Text(
+        widget.item.categoryName!.trim(),
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(
           color: Colors.grey,
           fontSize: 16,
         ),
-        maxLines: 2,
-      ),
+        maxLines: 1,
+      ) : null,
       onTap: () {
         widget.onTap(context, item: widget.item);
       },

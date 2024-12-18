@@ -1,11 +1,11 @@
 import 'package:drop_down_search_field/drop_down_search_field.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
 
 class FilterDialog extends StatefulWidget {
   Map<String, dynamic> filter;
+  Map<String, dynamic> stateStorage = {};
 
   FilterDialog({super.key, required this.filter});
 
@@ -16,7 +16,6 @@ class FilterDialog extends StatefulWidget {
 }
 
 class _FilterDialogState extends State<FilterDialog> {
-  String? _selectedCategoryName;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +29,7 @@ class _FilterDialogState extends State<FilterDialog> {
             DropDownSearchField(
               textFieldConfiguration: TextFieldConfiguration(
                 controller: TextEditingController(
-                    text: _selectedCategoryName ?? ""
+                    text: widget.stateStorage['category']?.name ?? ""
                 ),
                 decoration: const InputDecoration(
                   // border: OutlineInputBorder(),
@@ -50,7 +49,7 @@ class _FilterDialogState extends State<FilterDialog> {
               },
               onSuggestionSelected: (category) {
                 widget.filter['categoryId'] = category.id;
-                _selectedCategoryName = category.name;
+                widget.stateStorage['category'] = category;
                 setState(() {});
               },
               noItemsFoundBuilder: (context) {
@@ -61,6 +60,7 @@ class _FilterDialogState extends State<FilterDialog> {
               },
               isMultiSelectDropdown: false,
               displayAllSuggestionWhenTap: false,
+              initiallySelectedItems: widget.stateStorage['category'] != null ? [widget.stateStorage['category']!] : [],
             ),
             Container(
               padding: const EdgeInsets.only(top: 8.0),
@@ -76,7 +76,9 @@ class _FilterDialogState extends State<FilterDialog> {
                 }).toList(),
                 onSelected: (state) {
                   widget.filter['status'] = state?.index;
+                  widget.stateStorage['state'] = state;
                 },
+                initialSelection: widget.stateStorage['state'],
               ),
             )
           ],
