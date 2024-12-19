@@ -20,6 +20,8 @@ class SearchBarComponent extends StatefulWidget {
 }
 
 class _SearchBarComponentState extends State<SearchBarComponent> {
+  bool _filterToggle = false;
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -40,8 +42,11 @@ class _SearchBarComponentState extends State<SearchBarComponent> {
           Container(
             padding: const EdgeInsets.only(top: 10),
             child: IconButton(
-              icon: const Icon(Icons.filter_alt_sharp, size: 34,),
+              icon: Icon(_filterToggle ? Icons.filter_alt_sharp : Icons.filter_alt_off_sharp, size: 34,),
               onPressed: () {
+                setState(() {
+                  _filterToggle = !_filterToggle;
+                });
                 widget.onCustomFilterPress?.call(context);
               },
             )

@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_manage/model/app_database.dart';
 import 'package:todo_manage/widget/prefetch_scroll_list_view.dart';
 import 'package:todo_manage/widget/search_bar_component.dart';
-import 'package:todo_manage/widget/todo_thing/filter_dialog.dart';
+import 'package:todo_manage/widget/todo_thing/filter_bar.dart';
 import 'package:todo_manage/widget/todo_thing/refresh_notifier.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_detail.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_list_item.dart';
@@ -21,6 +20,7 @@ class TodoThingList extends StatefulWidget {
 class _TodoThingListState extends State<TodoThingList> {
   late PrefetchScrollListViewController<TodoThingDTO> _prefetchScrollListViewController;
   Map<String, dynamic> _listParams = {};
+  bool _showFilter = false;
 
   @override
   void initState() {
@@ -38,13 +38,15 @@ class _TodoThingListState extends State<TodoThingList> {
             onSearchChange: (text) => onSearchChange(text),
             onAddButtonPress: (ctx) => invokeEditPage(ctx),
             enableCustomFilter: true,
-            onCustomFilterPress: (ctx) => _invokeFilterDialog(ctx),
+            onCustomFilterPress: (ctx) => _showFilterBar(ctx),
           ),
+          if (_showFilter)
+            FilterBar(onFilterChange: _onFilterChange),
           Expanded(
-              child: PrefetchScrollListView<TodoThingDTO>(
-                  _prefetchScrollListViewController,
-                      (i) => TodoThingListItem(item: i, onTap: invokeEditPage)
-              )
+            child: PrefetchScrollListView<TodoThingDTO>(
+                _prefetchScrollListViewController,
+                    (i) => TodoThingListItem(item: i, onTap: invokeEditPage)
+            )
           ),
           Consumer<RefreshNotifier>(
             builder: (ctx, value, child) {
@@ -78,12 +80,20 @@ class _TodoThingListState extends State<TodoThingList> {
     return AppDatabase.instance.todoThingDao.page(pageIndex, pageSize, _listParams);
   }
 
-  void _invokeFilterDialog(BuildContext ctx) {
-    showDialog(
-      context: ctx,
-      builder: (context) => FilterDialog(filter: _listParams)
-    ).then((_) {
-      _prefetchScrollListViewController.refresh();
+  void _showFilterBar(BuildContext ctx) {
+    setState(() {
+      if (_showFilter) {
+        _listParams = {};
+        _showFilter = false;
+      } else {
+        _showFilter = true;
+      }
     });
   }
+
+  void _onFilterChange(Map<String, dynamic> params) {
+    _listParams = params;
+    _prefetchScrollListViewController.refresh();
+  }
+
 }

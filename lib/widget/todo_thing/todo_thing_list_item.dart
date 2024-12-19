@@ -26,7 +26,7 @@ class _TodoThingListItemState extends State<TodoThingListItem> {
       title: Text(
         widget.item.title,
         style: const TextStyle(
-          fontSize: 16,
+          fontSize: 18,
         ),
       ),
       subtitle: widget.item.categoryName != null ? Text(
