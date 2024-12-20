@@ -73,22 +73,23 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
                     )
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: DropdownMenu<TodoThingState>(
-                    label: const Text("状态"),
-                    initialSelection: _formData['status'],
-                    dropdownMenuEntries: TodoThingState.values.map<DropdownMenuEntry<TodoThingState>>((state) {
-                      return DropdownMenuEntry<TodoThingState>(
-                        value: state,
-                        label: state.text,
-                      );
-                    }).toList(),
-                    onSelected: (state) {
-                      _formData['status'] = state;
-                    },
+                if (!insertMode)
+                  Container(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: DropdownMenu<TodoThingState>(
+                      label: const Text("状态"),
+                      initialSelection: _formData['status'],
+                      dropdownMenuEntries: TodoThingState.values.map<DropdownMenuEntry<TodoThingState>>((state) {
+                        return DropdownMenuEntry<TodoThingState>(
+                          value: state,
+                          label: state.text,
+                        );
+                      }).toList(),
+                      onSelected: (state) {
+                        _formData['status'] = state;
+                      },
+                    )
                   )
-                )
               ],
             ),
             Container(

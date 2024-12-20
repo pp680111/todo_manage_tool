@@ -71,12 +71,12 @@ class _FilterBarState extends State<FilterBar> {
                 controller: TextEditingController(
                     text: _widgetStateStorage['category']?.name ?? ""
                 ),
-                decoration: const InputDecoration(
-                    label: Text(
+                decoration: InputDecoration(
+                    label: const Text(
                       "所属类型",
                       style: TextStyle(color: Colors.grey),
                     ),
-                    suffixIcon: Icon(Icons.arrow_drop_down)
+                    suffixIcon: IconButton(icon: const Icon(Icons.arrow_drop_down), onPressed: () {})
                 )
             ),
             suggestionsCallback: (pattern) async {
