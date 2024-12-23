@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:todo_manage/widget/search_bar_component.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_list.dart';
 
 import 'category/category_list.dart';
@@ -17,23 +15,21 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        children: [
-          NavigationRail(
-            selectedIndex: _selectedIndex,
-            labelType: NavigationRailLabelType.all,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            destinations: _getDestinationList()
-          ),Expanded(
-            child: _switchContainerComponent()
-          ),
-        ],
-      ),
+    return  Row(
+      children: [
+        NavigationRail(
+          selectedIndex: _selectedIndex,
+          labelType: NavigationRailLabelType.all,
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          destinations: _getDestinationList()
+        ),Expanded(
+          child: _switchContainerComponent()
+        ),
+      ],
     );
   }
 
