@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:todo_manage/widget/main_page.dart';
+import 'package:todo_manage/widget/platform/windows/tray_configuration.dart';
+import 'package:todo_manage/widget/platform/windows/windows_configuration.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WindowsConfiguration.initWindow();
+  TrayConfiguration.initTray();
 
   runApp(const MyApp());
 }

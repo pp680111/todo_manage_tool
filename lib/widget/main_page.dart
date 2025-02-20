@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_manage/widget/platform/windows/tray_event_listener.dart';
+import 'package:todo_manage/widget/platform/windows/windows_event_listener.dart';
 import 'package:todo_manage/widget/search_bar_component.dart';
 import 'package:todo_manage/widget/todo_thing/todo_thing_list.dart';
+import 'package:tray_manager/tray_manager.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'category/category_list.dart';
 
@@ -14,6 +18,13 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
+
+
+  @override
+  void initState() {
+    windowManager.addListener(WindowsEventListener(context));
+    trayManager.addListener(TrayEventListener());
+  }
 
   @override
   Widget build(BuildContext context) {
