@@ -24,6 +24,7 @@ class WindowsEventListener with WindowListener {
   void onWindowClose() async {
     bool _isPreventClose = await windowManager.isPreventClose();
     if (_isPreventClose) {
+      await windowManager.focus();
       showDialog(
           context: context,
           builder: (_) {
