@@ -5,19 +5,20 @@ import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
 import '../category/category_dto.dart';
 
 class TodoThingDTOMapper {
-  static TodoThingDTO mapToDTO(TodoThingData data) {
+  static Future<TodoThingDTO> mapToDTO(TodoThingData data) async {
     TodoThingDTO ret = _map(data);
-    _enhance([ret]);
+    await _enhance([ret]);
     return ret;
   }
 
-  static List<TodoThingDTO> mapToDTOList(List<TodoThingData> list) {
+  static Future<List<TodoThingDTO>> mapToDTOList(
+      List<TodoThingData> list) async {
     if (list.isEmpty) {
       return [];
     }
 
     List<TodoThingDTO> ret = list.map((e) => _map(e)).toList();
-    _enhance(ret);
+    await _enhance(ret);
     return ret;
   }
 
@@ -30,18 +31,17 @@ class TodoThingDTOMapper {
         categoryId: data.categoryId,
         createTime: data.createTime,
         updateTime: data.updateTime,
-        deadlineTime: data.deadlineTime
-    );
+        deadlineTime: data.deadlineTime);
   }
 
-  static void _enhance(List<TodoThingDTO> list) async {
+  static Future<void> _enhance(List<TodoThingDTO> list) async {
     List<int> categoryIds = list.map((e) => e.categoryId).nonNulls.toList();
     if (categoryIds.isEmpty) {
       return;
     }
 
-    List<CategoryDTO> categoryList = await AppDatabase.instance.categoryDao
-        .selectById(categoryIds);
+    List<CategoryDTO> categoryList =
+        await AppDatabase.instance.categoryDao.selectById(categoryIds);
     Map<int, CategoryDTO> categoryMap = {};
     for (CategoryDTO item in categoryList) {
       categoryMap[item.id] = item;

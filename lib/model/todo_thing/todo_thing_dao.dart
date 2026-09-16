@@ -9,18 +9,41 @@ import 'package:todo_manage/model/todo_thing/todo_thing_state.dart';
 part 'todo_thing_dao.g.dart';
 
 @DriftAccessor(tables: [TodoThing])
-class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixin {
-
+class TodoThingDao extends DatabaseAccessor<AppDatabase>
+    with _$TodoThingDaoMixin {
   TodoThingDao(super.database);
 
-  Future<List<TodoThingDTO>> page(int pageIndex, int pageSize, Map<String, dynamic>? params) {
-    SimpleSelectStatement<TodoThing, TodoThingData> statement = TodoThingQueryBuilder.buildStatement(params);
+  Future<List<TodoThingDTO>> page(
+      int pageIndex, int pageSize, Map<String, dynamic>? params) async {
+    SimpleSelectStatement<TodoThing, TodoThingData> statement =
+        TodoThingQueryBuilder.buildStatement(params);
 
     int start = (pageIndex <= 0 ? 0 : pageIndex - 1) * pageSize;
     statement.limit(pageSize, offset: start);
 
-    return statement.get()
-        .then((list) => TodoThingDTOMapper.mapToDTOList(list));
+    final list = await statement.get();
+    return TodoThingDTOMapper.mapToDTOList(list);
+  }
+
+  Future<List<TodoThingDTO>> findTodayUnfinished({
+    required DateTime day,
+    int limit = 5,
+  }) async {
+    final start = DateTime(day.year, day.month, day.day);
+    final end = start.add(const Duration(days: 1));
+    final statement = select(todoThing)
+      ..where((t) =>
+          t.deadlineTime.isBiggerOrEqualValue(start) &
+          t.deadlineTime.isSmallerThanValue(end) &
+          t.status.equals(TodoThingState.FINISHED.key).not())
+      ..orderBy([
+        (t) => OrderingTerm.asc(t.deadlineTime),
+        (t) => OrderingTerm.desc(t.createTime),
+      ])
+      ..limit(limit);
+
+    final list = await statement.get();
+    return TodoThingDTOMapper.mapToDTOList(list);
   }
 
   Future insertOrUpdateFromMap(Map<String, dynamic> formMap) {
@@ -29,6 +52,7 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixi
         _initDefValForFormMap(formMap);
         return into(todoThing).insert(_buildTodoThingCompanionFromMap(formMap));
       } else {
+        formMap['updateTime'] = DateTime.now();
         return (update(todoThing)..where((t) => t.id.equals(formMap['id'])))
             .write(_buildTodoThingCompanionFromMap(formMap));
       }
@@ -50,7 +74,8 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixi
     return (delete(todoThing)..where((t) => t.id.equals(id))).go();
   }
 
-  TodoThingCompanion _buildTodoThingCompanionFromMap(Map<String, dynamic> formMap) {
+  TodoThingCompanion _buildTodoThingCompanionFromMap(
+      Map<String, dynamic> formMap) {
     String? errMsg = _validateFormMap(formMap);
     if (errMsg != null) {
       throw Exception(errMsg);
@@ -63,8 +88,7 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixi
         categoryId: Value(formMap['categoryId']),
         createTime: Value(formMap['createTime']),
         updateTime: Value(formMap['updateTime']),
-        deadlineTime: Value(formMap['deadlineTime'])
-    );
+        deadlineTime: Value(formMap['deadlineTime']));
   }
 
   String? _validateFormMap(Map<String, dynamic> formMap) {
@@ -118,6 +142,8 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase> with _$TodoThingDaoMixi
         return '截止时间参数值类型错误';
       }
     }
+
+    return null;
   }
 
   void _initDefValForFormMap(Map<String, dynamic> formMap) {

@@ -10,10 +10,9 @@ enum TodoThingState {
   const TodoThingState(this.key, this.text);
 
   static TodoThingState fromKey(int key) {
-    TodoThingState state = TodoThingState.values.firstWhere((element) => element.key == key);
-    if (state == null) {
-      throw Exception('TodoThingState not found');
-    }
-    return state;
+    return TodoThingState.values.firstWhere(
+      (element) => element.key == key,
+      orElse: () => throw ArgumentError.value(key, 'key', 'Unknown todo state'),
+    );
   }
 }

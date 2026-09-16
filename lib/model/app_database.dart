@@ -14,7 +14,9 @@ import 'category/category.dart' as my_category;
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [TodoThing, TodoThingProgress, my_category.Category], daos: [TodoThingDao, TodoThingProgressDao, CategoryDao])
+@DriftDatabase(
+    tables: [TodoThing, TodoThingProgress, my_category.Category],
+    daos: [TodoThingDao, TodoThingProgressDao, CategoryDao])
 class AppDatabase extends _$AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
@@ -37,6 +39,7 @@ class AppDatabase extends _$AppDatabase {
       }
 
       File dbFile = File(path);
+      await dbFile.parent.create(recursive: true);
 
       return NativeDatabase(dbFile, logStatements: true);
     });
