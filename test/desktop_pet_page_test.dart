@@ -53,14 +53,10 @@ void main() {
 
   testWidgets('independent bubble renders its empty task state',
       (tester) async {
-    var closeCount = 0;
     var loadCount = 0;
     await tester.pumpWidget(
       MaterialApp(
         home: TaskBubblePage(
-          onClose: () async {
-            closeCount++;
-          },
           onOpenMainWindow: () async {},
           taskLoader: () async {
             loadCount++;
@@ -74,14 +70,11 @@ void main() {
     expect(find.text('今日未完成'), findsOneWidget);
     expect(find.text('今天的任务都完成啦'), findsOneWidget);
     expect(loadCount, 1);
+    expect(find.byTooltip('关闭'), findsNothing);
 
     await tester.tap(find.byTooltip('刷新'));
     await tester.pump();
     expect(loadCount, 2);
     expect(tester.takeException(), isNull);
-
-    await tester.tap(find.byTooltip('关闭'));
-    await tester.pump();
-    expect(closeCount, 1);
   });
 }

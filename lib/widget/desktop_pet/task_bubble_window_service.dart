@@ -13,16 +13,24 @@ class TaskBubbleWindowService {
   static const String moveMethod = 'move_bubble';
   static const String openMainMethod = 'open_main_window';
   static const String hiddenMethod = 'bubble_hidden';
+  static const String hideReasonBlur = 'blur';
+
+  /// When the bubble hides itself on blur, the click that stole its focus is
+  /// often the same pet tap whose trailing edge would toggle it open again.
+  static const Duration _blurToggleSuppression = Duration(milliseconds: 350);
+
   static const Size bubbleSize = Size(380, 360);
 
   final WindowController ownerWindow;
 
   WindowController? _bubbleWindow;
+  Future<WindowController>? _creatingBubble;
   Future<void> Function()? _onOpenMainWindow;
   bool _visible = false;
   bool _changingVisibility = false;
   bool _followInFlight = false;
   bool _followPending = false;
+  DateTime? _lastBlurHiddenAt;
 
   Future<void> initialize({
     required Future<void> Function() onOpenMainWindow,
@@ -33,6 +41,14 @@ class TaskBubbleWindowService {
 
   Future<void> toggle() async {
     if (_changingVisibility) return;
+    if (!_visible &&
+        _lastBlurHiddenAt != null &&
+        DateTime.now().difference(_lastBlurHiddenAt!) <
+            _blurToggleSuppression) {
+      // The blur from this very click already hid the bubble; a reopen here
+      // would make the pet feel unable to close it.
+      return;
+    }
     _changingVisibility = true;
     try {
       if (_visible) {
@@ -45,23 +61,20 @@ class TaskBubbleWindowService {
     }
   }
 
+  /// Spawns the bubble window hidden ahead of the first click, so showing
+  /// the bubble later only needs move/refresh/show messages instead of a
+  /// full Flutter engine cold start.
+  Future<void> prewarm() async {
+    await _ensureBubbleWindow(autoShow: false);
+  }
+
   Future<void> show() async {
-    final position = await _calculateBubblePosition();
-    var bubbleWindow = _bubbleWindow;
-    if (bubbleWindow == null) {
-      bubbleWindow = await WindowController.create(
-        WindowConfiguration(
-          hiddenAtLaunch: true,
-          arguments: jsonEncode({
-            'role': windowRole,
-            'ownerWindowId': ownerWindow.windowId,
-            'x': position.dx,
-            'y': position.dy,
-          }),
-        ),
-      );
-      _bubbleWindow = bubbleWindow;
-    } else {
+    // A window created inline with autoShow=true shows itself once its engine
+    // finishes booting; anything else needs an explicit show here.
+    final createsInline = _bubbleWindow == null && _creatingBubble == null;
+    final bubbleWindow = await _ensureBubbleWindow(autoShow: true);
+    if (!createsInline) {
+      final position = await _calculateBubblePosition();
       await bubbleWindow.invokeMethod<void>(moveMethod, {
         'x': position.dx,
         'y': position.dy,
@@ -70,6 +83,33 @@ class TaskBubbleWindowService {
       await bubbleWindow.show();
     }
     _visible = true;
+  }
+
+  Future<WindowController> _ensureBubbleWindow({required bool autoShow}) {
+    final bubbleWindow = _bubbleWindow;
+    if (bubbleWindow != null) {
+      return Future.value(bubbleWindow);
+    }
+    return _creatingBubble ??= _createBubbleWindow(autoShow: autoShow)
+        .whenComplete(() => _creatingBubble = null);
+  }
+
+  Future<WindowController> _createBubbleWindow({required bool autoShow}) async {
+    final position = await _calculateBubblePosition();
+    final bubbleWindow = await WindowController.create(
+      WindowConfiguration(
+        hiddenAtLaunch: true,
+        arguments: jsonEncode({
+          'role': windowRole,
+          'ownerWindowId': ownerWindow.windowId,
+          'x': position.dx,
+          'y': position.dy,
+          'autoShow': autoShow,
+        }),
+      ),
+    );
+    _bubbleWindow = bubbleWindow;
+    return bubbleWindow;
   }
 
   Future<void> hide() async {
@@ -119,6 +159,10 @@ class TaskBubbleWindowService {
     switch (call.method) {
       case hiddenMethod:
         _visible = false;
+        final arguments = call.arguments;
+        if (arguments is Map && arguments['reason'] == hideReasonBlur) {
+          _lastBlurHiddenAt = DateTime.now();
+        }
         return null;
       case openMainMethod:
         await hide();

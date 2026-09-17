@@ -16,24 +16,41 @@ class TaskBubbleApp extends StatefulWidget {
     required this.windowController,
     required this.ownerWindowId,
     required this.initialPosition,
+    this.autoShow = true,
   });
 
   final WindowController windowController;
   final String ownerWindowId;
   final Offset initialPosition;
 
+  /// Whether the window shows itself once configured. Prewarmed windows
+  /// stay hidden until the owner window sends the show command.
+  final bool autoShow;
+
   @override
   State<TaskBubbleApp> createState() => _TaskBubbleAppState();
 }
 
-class _TaskBubbleAppState extends State<TaskBubbleApp> {
+class _TaskBubbleAppState extends State<TaskBubbleApp> with WindowListener {
   int _refreshGeneration = 0;
 
   @override
   void initState() {
     super.initState();
+    windowManager.addListener(this);
     unawaited(widget.windowController.setWindowMethodHandler(_handleMethod));
     unawaited(_configureWindow());
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onWindowBlur() {
+    unawaited(_hide(reason: TaskBubbleWindowService.hideReasonBlur));
   }
 
   @override
@@ -48,7 +65,6 @@ class _TaskBubbleAppState extends State<TaskBubbleApp> {
       ),
       home: TaskBubblePage(
         key: ValueKey(_refreshGeneration),
-        onClose: _hide,
         onOpenMainWindow: _openMainWindow,
       ),
     );
@@ -70,8 +86,10 @@ class _TaskBubbleAppState extends State<TaskBubbleApp> {
       await windowManager.setResizable(false);
       await windowManager.setHasShadow(false);
       await windowManager.setPosition(widget.initialPosition);
-      await windowManager.show();
-      await windowManager.focus();
+      if (widget.autoShow) {
+        await windowManager.show();
+        await windowManager.focus();
+      }
     });
     await windowManager.setPreventClose(true);
   }
@@ -97,10 +115,12 @@ class _TaskBubbleAppState extends State<TaskBubbleApp> {
     }
   }
 
-  Future<void> _hide() async {
+  Future<void> _hide({String? reason}) async {
     await widget.windowController.hide();
     await WindowController.fromWindowId(widget.ownerWindowId)
-        .invokeMethod<void>(TaskBubbleWindowService.hiddenMethod);
+        .invokeMethod<void>(TaskBubbleWindowService.hiddenMethod, {
+      if (reason != null) 'reason': reason,
+    });
   }
 
   Future<void> _openMainWindow() async {
@@ -112,12 +132,10 @@ class _TaskBubbleAppState extends State<TaskBubbleApp> {
 class TaskBubblePage extends StatefulWidget {
   const TaskBubblePage({
     super.key,
-    required this.onClose,
     required this.onOpenMainWindow,
     this.taskLoader,
   });
 
-  final Future<void> Function() onClose;
   final Future<void> Function() onOpenMainWindow;
   final Future<List<TodoThingDTO>> Function()? taskLoader;
 
@@ -168,12 +186,6 @@ class _TaskBubblePageState extends State<TaskBubblePage> {
                       visualDensity: VisualDensity.compact,
                       onPressed: _reloadTasks,
                       icon: const Icon(Icons.refresh_rounded, size: 20),
-                    ),
-                    IconButton(
-                      tooltip: '关闭',
-                      visualDensity: VisualDensity.compact,
-                      onPressed: widget.onClose,
-                      icon: const Icon(Icons.close_rounded, size: 20),
                     ),
                   ],
                 ),
