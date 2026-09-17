@@ -30,6 +30,15 @@ class WindowsConfiguration {
   }
 
   static Future<void> showPetWindow() async {
+    // Windows ignores SetWindowPos bounds while a window is minimized and
+    // SW_RESTORE would clobber them again, so normalize the window state and
+    // hide it before applying the pet size; otherwise the pet reappears at
+    // the old main-window size.
+    if (await windowManager.isMinimized() ||
+        await windowManager.isMaximized()) {
+      await windowManager.restore();
+      await windowManager.hide();
+    }
     await windowManager.setTitle('Todo 桌面宠物');
     await _applyPetWindowStyle();
     if (_petPosition != null) {
@@ -38,7 +47,6 @@ class WindowsConfiguration {
       await windowManager.setAlignment(Alignment.bottomRight);
       _petPosition = await windowManager.getPosition();
     }
-    await windowManager.restore();
     await windowManager.show(inactive: true);
     await windowManager.setPreventClose(true);
   }
@@ -58,7 +66,10 @@ class WindowsConfiguration {
     await windowManager.setMinimizable(true);
     await windowManager.setHasShadow(true);
     await windowManager.setBackgroundColor(Colors.white);
-    await windowManager.setTitleBarStyle(TitleBarStyle.normal);
+    // The main window draws its own caption bar in MainPage; keeping the
+    // native title bar hidden avoids Windows not repainting the caption
+    // buttons after switching back from the frameless pet mode.
+    await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
     await windowManager.setSize(mainWindowSize);
     await windowManager.center();
     await windowManager.restore();

@@ -33,6 +33,9 @@ class _TodoThingDetailState extends State<TodoThingDetail> {
     if (widget.item != null) {
       _formData = widget.item!.toMap();
       insertMode = false;
+    } else {
+      final now = DateTime.now();
+      _formData["deadlineTime"] = DateTime(now.year, now.month, now.day, 23, 59);
     }
 
   }

@@ -68,6 +68,7 @@ class _MyAppState extends State<MyApp> with WindowListener {
   // Deferred so the prewarmed bubble engine does not compete with app startup.
   static const _bubblePrewarmDelay = Duration(seconds: 3);
 
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   bool _petMode = true;
   bool _changingWindowMode = false;
   Timer? _bubblePrewarmTimer;
@@ -89,7 +90,6 @@ class _MyAppState extends State<MyApp> with WindowListener {
     trayManager.addListener(_trayEventListener);
     TrayConfiguration.initTray(
       onShowMainWindow: _showMainWindow,
-      onShowPet: _showPet,
       onExit: _exitApplication,
     );
   }
@@ -106,6 +106,7 @@ class _MyAppState extends State<MyApp> with WindowListener {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Todo 桌面宠物',
+      navigatorKey: _navigatorKey,
       color: Colors.transparent,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -163,17 +164,6 @@ class _MyAppState extends State<MyApp> with WindowListener {
     }
   }
 
-  Future<void> _closeMainWindow() async {
-    if (_changingWindowMode) return;
-    await windowManager.hide();
-    try {
-      await _showPet();
-    } catch (_) {
-      await windowManager.show();
-      rethrow;
-    }
-  }
-
   Future<void> _exitApplication() async {
     await _taskBubbleWindow.hide();
     await windowManager.setPreventClose(false);
@@ -189,7 +179,32 @@ class _MyAppState extends State<MyApp> with WindowListener {
     if (_petMode) {
       unawaited(_exitApplication());
     } else {
-      unawaited(_closeMainWindow());
+      unawaited(_confirmExit());
+    }
+  }
+
+  Future<void> _confirmExit() async {
+    final navigatorContext = _navigatorKey.currentContext;
+    if (navigatorContext == null) return;
+    final confirmed = await showDialog<bool>(
+      context: navigatorContext,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('确认关闭应用？'),
+        content: const Text('关闭后桌面宠物也将一并退出。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('否'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('是'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed ?? false) {
+      await _exitApplication();
     }
   }
 

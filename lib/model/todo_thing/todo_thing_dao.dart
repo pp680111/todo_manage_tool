@@ -25,13 +25,14 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase>
     return TodoThingDTOMapper.mapToDTOList(list);
   }
 
+  /// Unfinished tasks whose deadline is still ahead of [now].
   Future<List<TodoThingDTO>> findTodayUnfinished({
     required DateTime now,
     int limit = 5,
   }) async {
     final statement = select(todoThing)
       ..where((t) =>
-          t.deadlineTime.isSmallerThanValue(now) &
+          t.deadlineTime.isBiggerThanValue(now) &
           t.status.equals(TodoThingState.FINISHED.key).not())
       ..orderBy([
         (t) => OrderingTerm.asc(t.createTime),

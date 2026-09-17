@@ -3,7 +3,6 @@ import 'package:tray_manager/tray_manager.dart';
 class TrayConfiguration {
   static Future<void> initTray({
     required Future<void> Function() onShowMainWindow,
-    required Future<void> Function() onShowPet,
     required Future<void> Function() onExit,
   }) async {
     await trayManager.setIcon('images/logo.ico');
@@ -11,18 +10,12 @@ class TrayConfiguration {
       items: [
         MenuItem(
           key: 'show_main_window',
-          label: '显示 Todo 窗口',
+          label: '显示窗口',
           onClick: (_) => onShowMainWindow(),
         ),
         MenuItem(
-          key: 'show_pet',
-          label: '显示桌面宠物',
-          onClick: (_) => onShowPet(),
-        ),
-        MenuItem.separator(),
-        MenuItem(
           key: 'exit',
-          label: '退出',
+          label: '关闭',
           onClick: (_) => onExit(),
         ),
       ],
