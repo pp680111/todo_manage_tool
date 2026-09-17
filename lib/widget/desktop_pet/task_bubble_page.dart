@@ -253,7 +253,7 @@ class _TaskBubblePageState extends State<TaskBubblePage> {
   Future<List<TodoThingDTO>> _loadTasks() {
     if (widget.taskLoader != null) return widget.taskLoader!();
     return AppDatabase.instance.todoThingDao.findTodayUnfinished(
-      day: DateTime.now(),
+      now: DateTime.now(),
     );
   }
 

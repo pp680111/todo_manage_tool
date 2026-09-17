@@ -26,19 +26,15 @@ class TodoThingDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<List<TodoThingDTO>> findTodayUnfinished({
-    required DateTime day,
+    required DateTime now,
     int limit = 5,
   }) async {
-    final start = DateTime(day.year, day.month, day.day);
-    final end = start.add(const Duration(days: 1));
     final statement = select(todoThing)
       ..where((t) =>
-          t.deadlineTime.isBiggerOrEqualValue(start) &
-          t.deadlineTime.isSmallerThanValue(end) &
+          t.deadlineTime.isSmallerThanValue(now) &
           t.status.equals(TodoThingState.FINISHED.key).not())
       ..orderBy([
-        (t) => OrderingTerm.asc(t.deadlineTime),
-        (t) => OrderingTerm.desc(t.createTime),
+        (t) => OrderingTerm.asc(t.createTime),
       ])
       ..limit(limit);
 
