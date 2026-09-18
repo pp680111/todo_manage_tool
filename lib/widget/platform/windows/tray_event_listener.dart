@@ -12,6 +12,11 @@ class TrayEventListener with TrayListener {
 
   @override
   void onTrayIconRightMouseDown() {
-    trayManager.popUpContextMenu();
+    // TrackPopupMenu only tracks correctly when the owning window is
+    // foreground; otherwise the menu flashes and closes instantly while
+    // Explorer keeps focus. This app is Windows-only, so the deprecated
+    // parameter is exactly the supported fix (MSDN KB135788).
+    // ignore: deprecated_member_use
+    trayManager.popUpContextMenu(bringAppToFront: true);
   }
 }
