@@ -41,7 +41,7 @@ class AppDatabase extends _$AppDatabase {
       File dbFile = File(path);
       await dbFile.parent.create(recursive: true);
 
-      return NativeDatabase(dbFile, logStatements: true);
+      return NativeDatabase(dbFile, logStatements: kDebugMode);
     });
   }
 }

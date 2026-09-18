@@ -31,7 +31,6 @@ Future<void> main(List<String> args) async {
           (windowArguments['x'] as num).toDouble(),
           (windowArguments['y'] as num).toDouble(),
         ),
-        autoShow: windowArguments['autoShow'] as bool? ?? true,
       ),
     );
     return;
@@ -65,13 +64,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WindowListener {
-  // Deferred so the prewarmed bubble engine does not compete with app startup.
-  static const _bubblePrewarmDelay = Duration(seconds: 3);
-
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   bool _petMode = true;
   bool _changingWindowMode = false;
-  Timer? _bubblePrewarmTimer;
   late final TrayEventListener _trayEventListener;
   late final TaskBubbleWindowService _taskBubbleWindow;
 
@@ -82,7 +77,11 @@ class _MyAppState extends State<MyApp> with WindowListener {
     unawaited(
       _taskBubbleWindow.initialize(onOpenMainWindow: _showMainWindow),
     );
-    _bubblePrewarmTimer = Timer(_bubblePrewarmDelay, () {
+    // Prewarm as soon as the pet's first frame is up instead of after a
+    // fixed delay: the first seconds after launch are exactly when users
+    // click, and a click during prewarm now joins the same boot instead of
+    // cold-starting a second engine inline.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) unawaited(_taskBubbleWindow.prewarm());
     });
     windowManager.addListener(this);
@@ -96,7 +95,6 @@ class _MyAppState extends State<MyApp> with WindowListener {
 
   @override
   void dispose() {
-    _bubblePrewarmTimer?.cancel();
     windowManager.removeListener(this);
     trayManager.removeListener(_trayEventListener);
     super.dispose();

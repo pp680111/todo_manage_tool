@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:desktop_multi_window/desktop_multi_window.dart';
@@ -9,6 +10,7 @@ class TaskBubbleWindowService {
   TaskBubbleWindowService(this.ownerWindow);
 
   static const String windowRole = 'task_bubble';
+  static const String readyMethod = 'bubble_ready';
   static const String refreshMethod = 'refresh_tasks';
   static const String moveMethod = 'move_bubble';
   static const String openMainMethod = 'open_main_window';
@@ -19,15 +21,30 @@ class TaskBubbleWindowService {
   /// often the same pet tap whose trailing edge would toggle it open again.
   static const Duration _blurToggleSuppression = Duration(milliseconds: 350);
 
+  /// If the bubble engine never reports ready (e.g. it dies mid-boot), stop
+  /// waiting after this long and present best-effort so clicks never hang.
+  static const Duration _readyFallbackTimeout = Duration(seconds: 20);
+
   static const Size bubbleSize = Size(380, 360);
 
   final WindowController ownerWindow;
 
   WindowController? _bubbleWindow;
   Future<WindowController>? _creatingBubble;
+  Completer<void>? _bubbleReady;
+  Timer? _readyFallbackTimer;
+
+  /// In-flight show; repeated clicks while the bubble engine is still booting
+  /// join this future instead of being dropped.
+  Future<void>? _showing;
+
+  /// Bumped by every hide; an in-flight show bails out if the count changed
+  /// while it was waiting, so "open main window" during a cold boot wins
+  /// immediately instead of queueing behind the boot.
+  int _hideCount = 0;
+
   Future<void> Function()? _onOpenMainWindow;
   bool _visible = false;
-  bool _changingVisibility = false;
   bool _followInFlight = false;
   bool _followPending = false;
   DateTime? _lastBlurHiddenAt;
@@ -40,82 +57,103 @@ class TaskBubbleWindowService {
   }
 
   Future<void> toggle() async {
-    if (_changingVisibility) return;
-    if (!_visible &&
-        _lastBlurHiddenAt != null &&
+    if (_lastBlurHiddenAt != null &&
         DateTime.now().difference(_lastBlurHiddenAt!) <
             _blurToggleSuppression) {
       // The blur from this very click already hid the bubble; a reopen here
       // would make the pet feel unable to close it.
       return;
     }
-    _changingVisibility = true;
-    try {
-      if (_visible) {
-        await hide();
-      } else {
-        await show();
-      }
-    } finally {
-      _changingVisibility = false;
+    if (_visible) {
+      await hide();
+    } else {
+      await show();
     }
   }
 
-  /// Spawns the bubble window hidden ahead of the first click, so showing
-  /// the bubble later only needs move/refresh/show messages instead of a
-  /// full Flutter engine cold start.
+  /// Spawns the bubble window hidden ahead of the first click and waits for
+  /// the child engine's ready handshake, so showing the bubble later only
+  /// needs move/refresh/show messages instead of a full Flutter engine cold
+  /// start.
   Future<void> prewarm() async {
-    await _ensureBubbleWindow(autoShow: false);
+    await _ensureBubbleWindow();
   }
 
-  Future<void> show() async {
-    // A window created inline with autoShow=true shows itself once its engine
-    // finishes booting; anything else needs an explicit show here.
-    final createsInline = _bubbleWindow == null && _creatingBubble == null;
-    final bubbleWindow = await _ensureBubbleWindow(autoShow: true);
-    if (!createsInline) {
-      final position = await _calculateBubblePosition();
-      await bubbleWindow.invokeMethod<void>(moveMethod, {
-        'x': position.dx,
-        'y': position.dy,
-      });
-      await bubbleWindow.invokeMethod<void>(refreshMethod);
-      await bubbleWindow.show();
-    }
+  /// Clicks that arrive while a show is still presenting (engine boot, move/
+  /// refresh round-trips) join the in-flight show instead of being dropped,
+  /// so the bubble appears as soon as it can.
+  Future<void> show() {
+    return _showing ??= _showNow().whenComplete(() => _showing = null);
+  }
+
+  Future<void> _showNow() async {
+    final hideCount = _hideCount;
+    final bubbleWindow = await _ensureBubbleWindow();
+    final position = await _calculateBubblePosition();
+    if (hideCount != _hideCount) return;
+    await bubbleWindow.invokeMethod<void>(moveMethod, {
+      'x': position.dx,
+      'y': position.dy,
+    });
+    await bubbleWindow.invokeMethod<void>(refreshMethod);
+    if (hideCount != _hideCount) return;
+    await bubbleWindow.show();
     _visible = true;
   }
 
-  Future<WindowController> _ensureBubbleWindow({required bool autoShow}) {
+  /// Hiding never queues behind a show that is waiting for the bubble engine
+  /// to boot (e.g. double-clicking the pet for the main window right after a
+  /// first click). The native hide works on a booting engine, so apply it
+  /// right away; a show that has not presented yet notices via [_hideCount].
+  Future<void> hide() async {
+    _hideCount++;
+    final bubbleWindow = _bubbleWindow;
+    if (bubbleWindow != null) await bubbleWindow.hide();
+    _visible = false;
+  }
+
+  /// Creates the bubble engine once and waits until the child window reports
+  /// itself ready (method handler registered, first frame painted, initial
+  /// task query settled), so presenting never shows a blank window and no
+  /// move/refresh message is sent into a still-booting engine.
+  Future<WindowController> _ensureBubbleWindow() {
     final bubbleWindow = _bubbleWindow;
     if (bubbleWindow != null) {
       return Future.value(bubbleWindow);
     }
-    return _creatingBubble ??= _createBubbleWindow(autoShow: autoShow)
+    return _creatingBubble ??= _createBubbleWindow()
         .whenComplete(() => _creatingBubble = null);
   }
 
-  Future<WindowController> _createBubbleWindow({required bool autoShow}) async {
+  Future<WindowController> _createBubbleWindow() async {
     final position = await _calculateBubblePosition();
-    final bubbleWindow = await WindowController.create(
-      WindowConfiguration(
-        hiddenAtLaunch: true,
-        arguments: jsonEncode({
-          'role': windowRole,
-          'ownerWindowId': ownerWindow.windowId,
-          'x': position.dx,
-          'y': position.dy,
-          'autoShow': autoShow,
-        }),
-      ),
-    );
-    _bubbleWindow = bubbleWindow;
-    return bubbleWindow;
-  }
-
-  Future<void> hide() async {
-    final bubbleWindow = _bubbleWindow;
-    if (bubbleWindow != null) await bubbleWindow.hide();
-    _visible = false;
+    final ready = Completer<void>();
+    _bubbleReady = ready;
+    _readyFallbackTimer = Timer(_readyFallbackTimeout, () {
+      if (!ready.isCompleted) ready.complete();
+    });
+    try {
+      final bubbleWindow = await WindowController.create(
+        WindowConfiguration(
+          hiddenAtLaunch: true,
+          arguments: jsonEncode({
+            'role': windowRole,
+            'ownerWindowId': ownerWindow.windowId,
+            'x': position.dx,
+            'y': position.dy,
+          }),
+        ),
+      );
+      _bubbleWindow = bubbleWindow;
+      await ready.future;
+      return bubbleWindow;
+    } finally {
+      _readyFallbackTimer?.cancel();
+      _readyFallbackTimer = null;
+      if (identical(_bubbleReady, ready)) {
+        _bubbleReady = null;
+      }
+    }
   }
 
   /// Keeps the bubble aligned with the pet window while it is being dragged.
@@ -157,6 +195,10 @@ class TaskBubbleWindowService {
 
   Future<dynamic> _handleWindowMethod(MethodCall call) async {
     switch (call.method) {
+      case readyMethod:
+        final ready = _bubbleReady;
+        if (ready != null && !ready.isCompleted) ready.complete();
+        return null;
       case hiddenMethod:
         _visible = false;
         final arguments = call.arguments;

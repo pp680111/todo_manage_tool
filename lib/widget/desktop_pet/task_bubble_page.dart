@@ -16,16 +16,11 @@ class TaskBubbleApp extends StatefulWidget {
     required this.windowController,
     required this.ownerWindowId,
     required this.initialPosition,
-    this.autoShow = true,
   });
 
   final WindowController windowController;
   final String ownerWindowId;
   final Offset initialPosition;
-
-  /// Whether the window shows itself once configured. Prewarmed windows
-  /// stay hidden until the owner window sends the show command.
-  final bool autoShow;
 
   @override
   State<TaskBubbleApp> createState() => _TaskBubbleAppState();
@@ -34,12 +29,17 @@ class TaskBubbleApp extends StatefulWidget {
 class _TaskBubbleAppState extends State<TaskBubbleApp> with WindowListener {
   int _refreshGeneration = 0;
 
+  late final Future<void> _configured = _configureWindow();
+  final Completer<void> _initialTasksSettled = Completer<void>();
+  bool _readySent = false;
+
   @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
     unawaited(widget.windowController.setWindowMethodHandler(_handleMethod));
-    unawaited(_configureWindow());
+    unawaited(_configured);
+    unawaited(_reportReady());
   }
 
   @override
@@ -66,7 +66,35 @@ class _TaskBubbleAppState extends State<TaskBubbleApp> with WindowListener {
       home: TaskBubblePage(
         key: ValueKey(_refreshGeneration),
         onOpenMainWindow: _openMainWindow,
+        onInitialTasksSettled: _handleInitialTasksSettled,
       ),
+    );
+  }
+
+  void _handleInitialTasksSettled() {
+    if (!_initialTasksSettled.isCompleted) {
+      _initialTasksSettled.complete();
+    }
+  }
+
+  /// Tells the owner window this engine finished booting: window configured,
+  /// first frame painted and the initial task query settled. The owner only
+  /// presents the bubble after this handshake, so it never shows a blank
+  /// window and its move/refresh messages cannot get lost in a booting
+  /// engine.
+  Future<void> _reportReady() async {
+    try {
+      await _configured;
+      await WidgetsBinding.instance.endOfFrame;
+      await _initialTasksSettled.future;
+    } catch (_) {
+      // Present best-effort even if a boot step failed.
+    }
+    if (_readySent) return;
+    _readySent = true;
+    unawaited(
+      WindowController.fromWindowId(widget.ownerWindowId)
+          .invokeMethod<void>(TaskBubbleWindowService.readyMethod),
     );
   }
 
@@ -86,10 +114,6 @@ class _TaskBubbleAppState extends State<TaskBubbleApp> with WindowListener {
       await windowManager.setResizable(false);
       await windowManager.setHasShadow(false);
       await windowManager.setPosition(widget.initialPosition);
-      if (widget.autoShow) {
-        await windowManager.show();
-        await windowManager.focus();
-      }
     });
     await windowManager.setPreventClose(true);
   }
@@ -134,10 +158,16 @@ class TaskBubblePage extends StatefulWidget {
     super.key,
     required this.onOpenMainWindow,
     this.taskLoader,
+    this.onInitialTasksSettled,
   });
 
   final Future<void> Function() onOpenMainWindow;
   final Future<List<TodoThingDTO>> Function()? taskLoader;
+
+  /// Invoked once when the first task query settles (success or failure);
+  /// the bubble app forwards it to the owner window as part of its ready
+  /// handshake.
+  final VoidCallback? onInitialTasksSettled;
 
   @override
   State<TaskBubblePage> createState() => _TaskBubblePageState();
@@ -150,6 +180,7 @@ class _TaskBubblePageState extends State<TaskBubblePage> {
   void initState() {
     super.initState();
     _tasks = _loadTasks();
+    unawaited(_tasks.whenComplete(() => widget.onInitialTasksSettled?.call()));
   }
 
   @override
